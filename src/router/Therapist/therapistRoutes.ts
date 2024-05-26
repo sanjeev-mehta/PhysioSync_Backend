@@ -1,11 +1,8 @@
-import { Router} from 'express';
-
-import { updateTherapist} from '../../controllers/Therapist/therapistController';
-import { isAuthenticated, isOwner } from '../../middlewares/index';
-
+import  { Router } from 'express';
+import { addTherapist } from '../../controllers/Therapist/therapistController';
+import { login } from '../../controllers/Therapist/loginController';
 
 export default (router: Router) => {
-    router.patch('/therapist/:id', isAuthenticated, isOwner, updateTherapist)
+    router.post('/auth/therapist_register', addTherapist);
+    router.post('/auth/login', login);
 }
-
-

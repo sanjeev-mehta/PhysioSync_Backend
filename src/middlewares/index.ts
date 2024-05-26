@@ -1,7 +1,8 @@
 import {Express, Request, Response} from 'express';
 import {get, identity, merge} from 'lodash';
+import Therapist from 'models/Therapist/therapistSignupSchema';
 
-import { getUserBySessionToken } from '../models/Therapist/therapistSignupSchema';
+export const getUserBySessionToken = (sessionToken: String) => Therapist.findOne({'authentication.sessionToken': sessionToken})
 
 export const isOwner = async (req: Request, res: Response, next: () => void) => {
     try{
