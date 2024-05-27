@@ -37,3 +37,46 @@ export const getAllExercise = async (req: Request, res: Response): Promise<void>
 };
 
 
+
+
+
+export const updateExercise = async (req: Request, res: Response): Promise<void> => {
+  try {
+    const { exerciseId } = req.params;
+    const updateData = req.body;
+
+    // Update the exercise in the database
+    const updatedExercise = await addExerciseModel.findByIdAndUpdate(exerciseId, updateData, { new: true });
+
+    if (!updatedExercise) {
+      res.status(404).json({ message: 'Exercise not found' });
+      return;
+    }
+
+    res.status(200).json(updatedExercise);
+  } catch (error) {
+    console.error('Error updating exercise:', error);
+    res.status(500).json({ message: 'Internal Server Error' });
+  }
+};
+
+
+export const delete_exercise = async (req: Request, res:Response): Promise<void>=>{
+  try{
+    const { exerciseId } = req.params;
+
+    const deleted_exercise = await addExerciseModel.findByIdAndDelete(exerciseId);
+
+  if (!deleted_exercise) {
+    res.status(404).json({ message: 'Exercise not found' });
+    return;
+  }
+
+  res.status(200).json(deleted_exercise);
+  console.log('Exercise deleted successfully:', deleted_exercise);
+
+} catch (error) {
+  console.error('Error deleting exercise:', error);
+  res.status(500).json({ message: 'Internal Server Error' });
+}}
+
