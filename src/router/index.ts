@@ -1,10 +1,12 @@
 import express, { Router } from 'express';
-import therapistCustroller from './Therapist/therapistRoutes';
+import therapistroutes from './Therapist/therapistRoutes';
+import assignExerciseRoutes from './Therapist/Exercise/exerciseRoutes'
 
 
 const router: Router = express.Router();
 
 export default (): Router => {
-    therapistCustroller(router);
+    therapistroutes(router);
+    assignExerciseRoutes(router);
     return router;
 }

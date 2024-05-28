@@ -10,7 +10,6 @@ const patientSignUpSchema = new mongoose.Schema({
     patient_gender: { type: String, required: true },
     patient_medical_history: { type: String, required: true },
     patient_photo: { type: String },
-    patient_medicine_reminder_time: { type: [String], required: true },
     patient_exercise_reminder_time: { type: [String], required: true },
     patient_created_at: { type: Date, default: Date.now },
     patient_updated_at: { type: Date, default: Date.now }
