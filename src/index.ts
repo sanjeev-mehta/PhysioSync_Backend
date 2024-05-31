@@ -13,6 +13,8 @@ import exercisesRoutes from './router/exercise/exercises_routes';
 import allcategories from './router/exercise/exercise_category_routes';
 import messageRoutes from './router/messages/messages';
 import path from 'path';
+import patientRoutes from './router/Patient/patientRoutes';
+
 
 const app = express();
 const server = http.createServer(app);
@@ -65,6 +67,8 @@ app.use('/api', exerciseCategoryRoutes);
 app.use('/api',exercisesRoutes);
 app.use('/api',allcategories);
 app.use('/api', messageRoutes);
+app.use('/api', patientRoutes);
+
 
 const startServer = async () => {
     await connectDB(); 
