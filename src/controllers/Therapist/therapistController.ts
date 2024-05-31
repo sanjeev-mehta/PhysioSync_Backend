@@ -1,5 +1,5 @@
 import { Express, Request, Response } from "express";
-import createTherapist from "../../models/Therapist/therapistModel";
+import {createTherapist, editTherapist, getSingleTherapist} from "../../models/Therapist/therapistModel";
 
 export const addTherapist = async (req: Request, res: Response) => {
   try {
@@ -32,6 +32,43 @@ export const addTherapist = async (req: Request, res: Response) => {
     }
   } catch (error: any) {
     console.error('Error in addTherapist controller:', error.message);
+    res.status(500).json({ status: 500, success: false, error: 'Internal Server Error' });
+  }
+};
+
+export const editTherapistController = async (req: Request, res: Response) => {
+  try {
+    const { sessionToken } = req.params;
+    const newData = req.body;
+
+    console.log('Received data for editing therapist:', newData);
+
+    const result = await editTherapist(sessionToken, newData);
+
+    if (result && result.success) {
+      res.status(200).json({ status: 200, success: true, message: result.message, data: result.data });
+    } else {
+      res.status(404).json({ status: 404, success: false, error: result.message });
+    }
+  } catch (error: any) {
+    console.error('Error in editTherapist controller:', error.message);
+    res.status(500).json({ status: 500, success: false, error: 'Internal Server Error' });
+  }
+};
+
+export const getTherapistController = async (req: Request, res: Response) => {
+  try {
+    const { sessionToken } = req.params;
+  
+    const result = await getSingleTherapist(sessionToken);
+
+    if (result && result.success) {
+      res.status(200).json({ status: 200, success: true, message: result.message, data: result.data });
+    } else {
+      res.status(404).json({ status: 404, success: false, error: result.message });
+    }
+  } catch (error: any) {
+    console.error('Error in editTherapist controller:', error.message);
     res.status(500).json({ status: 500, success: false, error: 'Internal Server Error' });
   }
 };

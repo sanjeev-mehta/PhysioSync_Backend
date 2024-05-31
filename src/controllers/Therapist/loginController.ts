@@ -27,9 +27,9 @@ export const login = async (req: Request, res: Response) => {
 
         const uid = userRecord.uid;
 
-        if (!userRecord.emailVerified) {
-            return res.status(403).json({ message: 'Email is not verified.' });
-        }
+        // if (!userRecord.emailVerified) {
+        //     return res.status(403).json({ message: 'Email is not verified.' });
+        // }
 
         const user = await Therapist.findOne({ firebase_uid: uid }).select('+authentication.salt +authentication.password');
 
