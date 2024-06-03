@@ -3,13 +3,12 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>One-to-One Messaging Demo</title>
-    
+    <title>Therapist Messaging</title>
     <script defer src="http://localhost:8080/socket.io/socket.io.js"></script>
-    <script defer src="client.js"></script>
+    <script defer src="therapist.js"></script>
 </head>
 <body>
-    <h1>One-to-One Messaging Demo</h1>
+    <h1>Therapist Messaging</h1>
     <div>
         <label for="tokenInput">Enter Your Token:</label>
         <input type="text" id="tokenInput" placeholder="Enter your token...">
@@ -17,10 +16,8 @@
     </div>
     <div id="memberList"></div>
     <div>
-        <label for="recipientSelect">Select Recipient:</label>
-        <select id="recipientSelect">
-            <!-- Options will be dynamically populated -->
-        </select>
+        <label for="recipientSelect">Select Patient:</label>
+        <select id="recipientSelect"></select>
     </div>
     <div>
         <textarea id="messageInput" rows="4" cols="50" placeholder="Type your message..."></textarea>
