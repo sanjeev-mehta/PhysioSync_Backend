@@ -2,6 +2,7 @@ import { Request, Response } from 'express';
 import admin from '../../config/firebaseAdmin'; // Make sure you have firebase admin setup
 import Patient, { IPatient } from '../../models/Patient/patientModel';
 import bcrypt from 'bcryptjs';
+import { random, authentication } from '../../helpers/index';
 
 interface PatientData {
   therapist_Id: string;
@@ -9,9 +10,10 @@ interface PatientData {
   last_name: string;
   patient_email: string;
   injury_details: string;
-  password: string;
   exercise_reminder_time: string;
   medicine_reminder_time: string;
+  password: string;
+  salt: string;
   date_of_birth: Date;
   allergy_if_any?: string;
   profile_photo?: string;
@@ -27,7 +29,6 @@ export const addNewPatient = async (req: Request, res: Response) => {
       last_name,
       patient_email,
       injury_details,
-      password,
       exercise_reminder_time,
       medicine_reminder_time,
       date_of_birth,
@@ -37,8 +38,7 @@ export const addNewPatient = async (req: Request, res: Response) => {
       medical_history
     }: PatientData = req.body;
 
-    const salt = bcrypt.genSaltSync(10);
-    const hashedPassword = bcrypt.hashSync(password, salt);
+     const salt = random();
 
     const newPatient = new Patient({
       therapist_Id,
@@ -46,9 +46,9 @@ export const addNewPatient = async (req: Request, res: Response) => {
       last_name,
       patient_email,
       injury_details,
-      password: hashedPassword,
       exercise_reminder_time,
       medicine_reminder_time,
+      salt,
       date_of_birth,
       allergy_if_any,
       profile_photo,
@@ -95,3 +95,82 @@ export const getAllPatients = async (req: Request, res: Response) => {
       res.status(500).json({ message: 'Internal server error' });
     }
   };
+
+  export const verifyEmail = async (req:Request, res:Response) => {
+    try {
+      const {email} = req.params; 
+      const getEmail = await Patient.find({ patient_email: email});
+
+      if(!getEmail || getEmail.length === 0){
+        res.status(404).json({message: "Email not found"})
+      }
+      
+      res.status(200).json({message: "Email found Successful" , data:getEmail});
+
+    } catch (error) {
+      res.status(500).json({ message: 'Internal server error' });
+    }
+  }
+
+
+  export const setPassword = async (req:Request, res:Response) => {
+    try {
+      const {email} = req.params; 
+      const getEmail = await Patient.find({ patient_email: email});
+
+      if(!getEmail || getEmail.length === 0){
+        res.status(404).json({message: "Email not found"})
+      }
+     
+      const patient = getEmail[0];
+
+      if (patient.password) {
+          return res.status(409).json({ message: "Password already set" });
+      }
+
+      const { password } = req.body;
+
+      const salt = random();
+      const hashedPassword = authentication(salt, password);
+
+      const response = await Patient.updateOne({ _id: patient._id }, { password: hashedPassword });
+
+
+      res.status(200).json({ message: "Password updated successfully", data: response });
+      
+    } catch (error) {
+      res.status(500).json({ message: 'Internal server error' });
+    }
+  }
+
+  export const patientLogin = async (req:Request, res:Response) => {
+      try {
+        const { email, password } = req.body;
+
+        console.log(email, password);
+
+        if (!email || !password) {
+            return res.status(400).json({ message: 'Email and password are required.' });
+        }
+
+        const user = await Patient.findOne( { patient_email: email} ).select('+.salt +.password');
+
+        if (!user) {
+            return res.status(409).json({ message: 'User not found.' });
+        }
+
+        const expectedHash = authentication(user.salt, password);
+
+        if(user.password != expectedHash){
+            return res.sendStatus(403);
+        }
+
+        await user.save();
+
+        return res.status(200).json({ message: 'Login successful', user }).end();
+
+    } catch (error) {
+        console.log('Error during login:', error);
+        return res.sendStatus(500).json({ message: 'Internal server error.' });
+    }
+}
