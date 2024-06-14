@@ -90,6 +90,7 @@ app.use('/api', allcategories);
 app.use('/api', messageRoutes);
 app.use('/api', patientRoutes);
 
+
 const startServer = async () => {
   await connectDB();
 

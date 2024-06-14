@@ -17,6 +17,7 @@ export interface IPatient extends Document {
   medical_history?: string;
   created_at: Date;
   updated_at: Date;
+  is_active: boolean; 
 }
 
 const PatientSchema: Schema = new Schema({
@@ -35,7 +36,9 @@ const PatientSchema: Schema = new Schema({
   gender: { type: String, required: true },
   medical_history: { type: String },
   created_at: { type: Date, default: Date.now },
-  updated_at: { type: Date, default: Date.now }
+  updated_at: { type: Date, default: Date.now },
+  is_active: { type: Boolean, default: true } 
+
 });
 
 const Patient = mongoose.model<IPatient>('Patients', PatientSchema);
