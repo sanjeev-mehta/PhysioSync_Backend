@@ -1,5 +1,5 @@
 import { Request, Response } from 'express';
-import admin from '../../config/firebaseAdmin'; // Make sure you have firebase admin setup
+// import admin from '../../config/firebaseAdmin'; 
 import Patient, { IPatient } from '../../models/Patient/patientModel';
 import bcrypt from 'bcryptjs';
 
@@ -17,6 +17,7 @@ interface PatientData {
   profile_photo?: string;
   gender: string;
   medical_history?: string;
+  is_active?: boolean;
 }
 
 export const addNewPatient = async (req: Request, res: Response) => {
@@ -34,7 +35,8 @@ export const addNewPatient = async (req: Request, res: Response) => {
       allergy_if_any,
       profile_photo,
       gender,
-      medical_history
+      medical_history,
+      is_active = true
     }: PatientData = req.body;
 
     const salt = bcrypt.genSaltSync(10);
@@ -53,7 +55,8 @@ export const addNewPatient = async (req: Request, res: Response) => {
       allergy_if_any,
       profile_photo,
       gender,
-      medical_history
+      medical_history,
+      is_active
     });
 
     const savedPatient = await newPatient.save();
@@ -65,33 +68,54 @@ export const addNewPatient = async (req: Request, res: Response) => {
 
 
 export const getAllPatients = async (req: Request, res: Response) => {
-    try {
-      const therapistId: string = req.params.therapistId;
-  
-      // Query the database to find patients associated with the therapist
-      const patients = await Patient.find({ therapist_Id: therapistId });
-  
-      res.status(200).json(patients);
-    } catch (error) {
-      res.status(500).json({ message: 'Internal server error' });
-    }
-  };
+  try {
+    const therapistId: string = req.params.therapistId;
+
+    // Query the database to find patients associated with the therapist
+    const patients = await Patient.find({ therapist_Id: therapistId });
+
+    res.status(200).json(patients);
+  } catch (error) {
+    res.status(500).json({ message: 'Internal server error' });
+  }
+};
 
 
-  export const updatePatient = async (req: Request, res: Response) => {
-    try {
-      const patientId: string = req.params.patientId; 
-      const updatedData = req.body; // Data to be updated
-  
-      // Find the patient by ID and update their information
-      const updatedPatient = await Patient.findByIdAndUpdate(patientId, updatedData, { new: true });
-  
-      if (!updatedPatient) {
-        return res.status(404).json({ message: 'Patient not found' });
-      }
-  
-      res.status(200).json(updatedPatient);
-    } catch (error) {
-      res.status(500).json({ message: 'Internal server error' });
+export const updatePatient = async (req: Request, res: Response) => {
+  try {
+    const patientId: string = req.params.patientId;
+    const updatedData = req.body; // Data to be updated
+
+    // Find the patient by ID and update their information
+    const updatedPatient = await Patient.findByIdAndUpdate(patientId, updatedData, { new: true });
+
+    if (!updatedPatient) {
+      return res.status(404).json({ message: 'Patient not found' });
     }
-  };
+
+    res.status(200).json(updatedPatient);
+  } catch (error) {
+    res.status(500).json({ message: 'Internal server error' });
+  }
+};
+
+export const disablePatient = async (req: Request, res: Response) => {
+  try {
+    const patientId: string = req.params.patientId;
+
+    const updatedPatient = await Patient.findByIdAndUpdate(
+      patientId,
+      { is_active: false },
+      { new: true }
+    );
+
+    if (!updatedPatient) {
+      return res.status(404).json({ message: 'Patient not found' });
+    }
+
+    res.status(200).json(updatedPatient);
+  } catch (error) {
+    res.status(500).json({ message: 'Internal server error' });
+  }
+};
+
