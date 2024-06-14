@@ -9,8 +9,6 @@ export interface addExercise extends Document{
     video_Url: String;
     video_title: String;
     description: String;
-   
-
 }
 
 const addExerciseSchema = new Schema({
