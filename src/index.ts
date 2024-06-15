@@ -84,8 +84,9 @@ app.use(cookieParser());
 app.use(bodyparser.json());
 
 app.use('/', router());
-app.use('/', () => {
+app.use('/', (req, res) => {
   console.log("Hi");
+  res.status(200).json("Hii there")
 });
 // app.use('/api', exerciseCategoryRoutes);
 // app.use('/api', exercisesRoutes);
