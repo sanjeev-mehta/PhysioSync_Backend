@@ -112,7 +112,11 @@ export const disablePatient = async (req: Request, res: Response) => {
     if (!updatedPatient) {
       return res.status(404).json({ message: 'Patient not found' });
     }
-  };
+    res.status(200).json(updatedPatient)
+  } catch (error) {
+  res.status(500).json({ message: 'Internal server error' });
+}
+}
 
   export const verifyEmail = async (req:Request, res:Response) => {
     try {
@@ -192,8 +196,4 @@ export const disablePatient = async (req: Request, res: Response) => {
         return res.sendStatus(500).json({ message: 'Internal server error.' });
     }
 }
-    res.status(200).json(updatedPatient);
-  } catch (error) {
-    res.status(500).json({ message: 'Internal server error' });
-  }
-};
+    

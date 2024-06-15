@@ -84,18 +84,24 @@ app.use(cookieParser());
 app.use(bodyparser.json());
 
 app.use('/', router());
-app.use('/api', exerciseCategoryRoutes);
-app.use('/api', exercisesRoutes);
-app.use('/api', allcategories);
-app.use('/api', messageRoutes);
-app.use('/api', patientRoutes);
+app.use('/', (req, res) => {
+  console.log("Hi");
+  res.status(200).json("Hii there")
+});
+// app.use('/api', exerciseCategoryRoutes);
+// app.use('/api', exercisesRoutes);
+// app.use('/api', allcategories);
+// app.use('/api', messageRoutes);
+// app.use('/api', patientRoutes);
 
+
+const PORT = process.env.myPort;
 
 const startServer = async () => {
   await connectDB();
 
-  server.listen(8080, () => {
-    console.log('Server running on http://localhost:8080/');
+  server.listen(PORT, () => {
+    console.log(`Server running on http://localhost:${PORT}/`);
   });
 };
 
