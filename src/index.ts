@@ -84,11 +84,14 @@ app.use(cookieParser());
 app.use(bodyparser.json());
 
 app.use('/', router());
-app.use('/api', exerciseCategoryRoutes);
-app.use('/api', exercisesRoutes);
-app.use('/api', allcategories);
-app.use('/api', messageRoutes);
-app.use('/api', patientRoutes);
+app.use('/', () => {
+  console.log("Hi");
+});
+// app.use('/api', exerciseCategoryRoutes);
+// app.use('/api', exercisesRoutes);
+// app.use('/api', allcategories);
+// app.use('/api', messageRoutes);
+// app.use('/api', patientRoutes);
 
 
 const PORT = process.env.myPort;
