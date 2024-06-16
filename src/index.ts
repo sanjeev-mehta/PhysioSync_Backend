@@ -28,12 +28,27 @@ interface User {
   [key: string]: string;
 }
 const users: User = {};
+
+const onlineUsers: Set<string> = new Set();
+
+const updateOnlineUsers = () => {
+  io.emit('onlineUsers', Array.from(onlineUsers));
+};
+
+
+
 io.on('connection', (socket: Socket) => {
   console.log('A user connected:', socket.id);
 
   socket.on('register', (userId) => {
+    // users[userId] = socket.id;
+  onlineUsers.add(userId);
     socket.join(userId);
     console.log(`User ${userId} joined room ${userId}`);
+  });
+
+  socket.on('getOnlineUsers', () => {
+    socket.emit('onlineUsers', Array.from(onlineUsers));
   });
 
   socket.on('send', async (data) => {
@@ -77,7 +92,7 @@ io.on('connection', (socket: Socket) => {
           { sender_id: senderId, receiver_id: receiverId },
           { sender_id: receiverId, receiver_id: senderId }
         ]
-      }).sort({ createdAt: -1 }).limit(100); // Adjust limit as needed
+      }).sort({ createdAt: -1 }).limit(100); 
       socket.emit('previousMessages', messages);
       console.log(`Fetched previous messages for ${senderId} and ${receiverId}`);
     } catch (error) {
@@ -90,9 +105,13 @@ io.on('connection', (socket: Socket) => {
   socket.on('disconnect', () => {
     const userId = Object.keys(users).find(key => users[key] === socket.id);
     if (userId) {
-      console.log(`${userId} left`);
-      socket.broadcast.emit('left', userId);
       delete users[userId];
+      onlineUsers.delete(userId);
+
+      console.log(`${userId} left`);
+      updateOnlineUsers();
+
+      socket.broadcast.emit('left', userId);
     }
   });
 });
