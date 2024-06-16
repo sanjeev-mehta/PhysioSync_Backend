@@ -69,8 +69,10 @@ io.on('connection', (socket: Socket) => {
     }
 });
 
-  socket.on('typing', ({ isTyping }) => {
-    socket.broadcast.emit('typing', { isTyping }); 
+  socket.on('typing', ({ data }) => {
+    const { id, isTyping } = data;
+    io.to(id).emit('typing');
+    // socket.broadcast.emit('typing', { isTyping }); 
   });
 
   socket.on('fetchPreviousMessages', async (data) => {
