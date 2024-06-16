@@ -68,6 +68,24 @@ io.on('connection', (socket: Socket) => {
     socket.broadcast.emit('typing', { isTyping }); 
   });
 
+  socket.on('fetchPreviousMessages', async (data) => {
+    const { senderId, receiverId } = data;
+    try {
+      const messages = await MessageModel.find({
+        $or: [
+          { sender_id: senderId, receiver_id: receiverId },
+          { sender_id: receiverId, receiver_id: senderId }
+        ]
+      }).sort({ createdAt: -1 }).limit(100); // Adjust limit as needed
+      socket.emit('previousMessages', messages);
+      console.log(`Fetched previous messages for ${senderId} and ${receiverId}`);
+    } catch (error) {
+      console.error('Error fetching previous messages:', error);
+    }
+  });
+
+  
+
   socket.on('disconnect', () => {
     const userId = Object.keys(users).find(key => users[key] === socket.id);
     if (userId) {
