@@ -63,7 +63,11 @@ io.on('connection', (socket: Socket) => {
       console.error('Error updating message status:', error);
     }
   });
-  
+
+  socket.on('typing', ({ isTyping }) => {
+    socket.broadcast.emit('typing', { isTyping }); 
+  });
+
   socket.on('disconnect', () => {
     const userId = Object.keys(users).find(key => users[key] === socket.id);
     if (userId) {

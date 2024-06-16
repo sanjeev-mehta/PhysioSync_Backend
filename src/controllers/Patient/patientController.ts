@@ -1,9 +1,13 @@
 import { Request, Response } from 'express';
 // import admin from '../../config/firebaseAdmin'; 
-import Patient, { IPatient } from '../../models/Patient/patientModel';
+import Patient from '../../models/Patient/patientModel';
 import bcrypt from 'bcryptjs';
 import { random, authentication } from '../../helpers/index';
 import { has } from 'lodash';
+import NotificationReminder from '../../models/Patient/notification';
+import mongoose  from 'mongoose';
+
+
 
 interface PatientData {
   therapist_Id: string;
@@ -204,3 +208,66 @@ export const getPatient = async (req: Request, res: Response) => {
     }
 }
     
+export const addNotificationReminder = async (req: Request, res: Response): Promise<Response> => {
+  try {
+    const { patient_id, reminder_time } = req.body;
+
+    const newReminder = new NotificationReminder({
+      patient_id: new mongoose.Types.ObjectId(patient_id),
+      reminder_time: new Date(reminder_time),
+    });
+
+    await newReminder.save();
+
+    return res.status(201).json({ success: true, message: 'Notification reminder added successfully', data: newReminder });
+  } catch (error) {
+    console.error('Error adding notification reminder:', (error as Error).message);
+    return res.status(500).json({ success: false, message: 'Failed to add notification reminder' });
+  }
+};
+
+export const getNotificationReminders = async (req: Request, res: Response): Promise<Response> => {
+  try {
+    const patientId = req.params.patientId;
+
+    if (!mongoose.Types.ObjectId.isValid(patientId)) {
+      return res.status(400).json({ success: false, message: 'Invalid patient ID' });
+    }
+
+    const reminders = await NotificationReminder.find({ patient_id: patientId });
+
+    return res.status(200).json({ success: true, reminders });
+  } catch (error) {
+    console.error('Error fetching notification reminders:', (error as Error).message);
+    return res.status(500).json({ success: false, message: 'Failed to fetch notification reminders' });
+  }
+};
+
+export const updateNotificationReminder = async (req: Request, res: Response): Promise<Response> => {
+  try {
+    const patientId = req.params.patientId;
+
+    if (!mongoose.Types.ObjectId.isValid(patientId)) {
+      return res.status(400).json({ success: false, message: 'Invalid patient ID' });
+    }
+
+    const { reminder_time } = req.body;
+
+    let reminder = await NotificationReminder.findOne({ patient_id: patientId });
+
+    if (!reminder) {
+      return res.status(404).json({ success: false, message: 'Reminder not found for the given patient ID' });
+    }
+
+    if (reminder_time) {
+      reminder.reminder_time = new Date(reminder_time);
+    }
+
+    reminder = await reminder.save();
+
+    return res.status(200).json({ success: true, message: 'Notification reminder updated successfully', reminder });
+  } catch (error) {
+    console.error('Error updating notification reminder:', (error as Error).message);
+    return res.status(500).json({ success: false, message: 'Failed to update notification reminder' });
+  }
+};

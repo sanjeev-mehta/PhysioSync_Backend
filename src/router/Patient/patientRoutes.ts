@@ -1,5 +1,5 @@
 import { Router } from 'express';
-import { addNewPatient,getAllPatients,updatePatient, disablePatient, getPatient, verifyEmail, setPassword, patientLogin } from '../../controllers/Patient/patientController';
+import { addNewPatient,getAllPatients,updatePatient, disablePatient, getPatient, verifyEmail, setPassword, patientLogin,addNotificationReminder,getNotificationReminders, updateNotificationReminder } from '../../controllers/Patient/patientController';
 import { isAuthenticated } from '../../middlewares/index';
 
 export default (router: Router) => {
@@ -11,6 +11,11 @@ export default (router: Router) => {
     router.get('/get_patient/:patient_id', isAuthenticated, getPatient);
     router.post('/set_password', setPassword);
     router.post('/patient_login', patientLogin);
+    router.post('/new_Notification_time', addNotificationReminder);
+    router.get('/get_notification_time/:patientId', getNotificationReminders);
+    router.put('/update_notification_time/:patientId', updateNotificationReminder);
+
+
 };
 
 
