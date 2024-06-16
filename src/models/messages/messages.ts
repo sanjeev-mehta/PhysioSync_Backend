@@ -36,6 +36,6 @@ const messageSchema = new Schema<IMessage>({
 
 });
 
-const MessageModel = model<IMessage>('Message-test', messageSchema);
+const MessageModel = model<IMessage>('message-physio', messageSchema);
 
 export default MessageModel;
