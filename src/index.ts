@@ -55,15 +55,19 @@ io.on('connection', (socket: Socket) => {
     console.log(`Message sent to receiver ${receiverId}`);
   });
 
-  socket.on('messageRead', async (data) => {
-    const { messageId } = data;
+  socket.on('messageRead', async (messageIds) => {
     try {
-      await MessageModel.findByIdAndUpdate(messageId, { is_read: true });
-      console.log(`Message ${messageId} marked as read`);
+        await MessageModel.updateMany(
+            { _id: { $in: messageIds } },
+            { is_read: true }
+        );
+        console.log(`Messages ${messageIds.join(', ')} marked as read`);
+        socket.emit('messageReadResponse', { success: true });
     } catch (error) {
-      console.error('Error updating message status:', error);
+        console.error('Error updating message statuses:', error);
+        socket.emit('messageReadResponse', { success: false });
     }
-  });
+});
 
   socket.on('typing', ({ isTyping }) => {
     socket.broadcast.emit('typing', { isTyping }); 
