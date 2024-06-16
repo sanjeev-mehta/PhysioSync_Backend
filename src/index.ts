@@ -51,7 +51,8 @@ io.on('connection', (socket: Socket) => {
     const receiverSocketId = users[receiverId];
     // if (receiverSocketId) {
       // io.to(receiverSocketId).emit('receive', { sender: senderId, message });
-      io.emit('receive', { sender: senderId, message });
+      io.to(receiverId).emit('receive', { sender: senderId, message });
+      // io.emit('receive', { sender: senderId, message });
     // }
   });
   socket.on('disconnect', () => {
