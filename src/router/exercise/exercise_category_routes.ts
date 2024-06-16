@@ -1,12 +1,10 @@
-import express from 'express';
-import { createExerciseCategory } from '../../controllers/exercise/exercise_category_controller';
-import { getAllExerciseCategories } from '../../controllers/exercise/exercise_category_controller'; // Make sure to create this file
+import  { Router } from 'express';
+import { createExerciseCategory, getAllExerciseCategories } from '../../controllers/exercise/exercise_category_controller';
+import { isAuthenticated } from '../../middlewares/index';
 
-
-const router = express.Router();
+export default (router: Router) => {
 
 router.post('/exercise-categories', createExerciseCategory);
-router.get('/getAllcategories', getAllExerciseCategories); // New route to get all categories
+router.get('/getAllcategories', isAuthenticated, getAllExerciseCategories); // New route to get all categories
 
-
-export default router;
+}
