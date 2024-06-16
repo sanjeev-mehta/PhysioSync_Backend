@@ -71,7 +71,7 @@ io.on('connection', (socket: Socket) => {
 
   socket.on('typing', ({ data }) => {
     const { id, isTyping } = data;
-    io.to(id).emit('typing');
+    // io.to(id).emit('typing');
     // socket.broadcast.emit('typing', { isTyping }); 
   });
 
