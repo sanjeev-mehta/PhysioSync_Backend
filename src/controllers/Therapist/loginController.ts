@@ -50,7 +50,7 @@ export const login = async (req: Request, res: Response) => {
 
         res.cookie('physio-sync', user.authentication.sessionToken, { domain: 'localhost', path: '/', httpOnly: true });
 
-        return res.status(200).json({ message: 'Login successful', user }).end();
+        return res.status(200).json({ message: 'Login successful', data: user }).end();
 
     } catch (error) {
         console.log('Error during login:', error);

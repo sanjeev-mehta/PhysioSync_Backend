@@ -2,7 +2,8 @@ import express, { Router } from 'express';
 import therapistroutes from './Therapist/therapistRoutes';
 import assignExerciseRoutes from './Therapist/Exercise/exerciseRoutes'
 import patientRoutes from './Patient/patientRoutes';
-
+import exercise_category_routes from './exercise/exercise_category_routes';
+import exercises_routes from './exercise/exercises_routes';
 
 const router: Router = express.Router();
 
@@ -11,5 +12,7 @@ export default (): Router => {
     assignExerciseRoutes(router);
     assignExerciseRoutes(router);
     patientRoutes(router)
+    exercise_category_routes(router)
+    exercises_routes (router)
     return router;
 }

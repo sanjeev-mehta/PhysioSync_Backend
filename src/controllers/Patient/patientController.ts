@@ -3,6 +3,7 @@ import { Request, Response } from 'express';
 import Patient, { IPatient } from '../../models/Patient/patientModel';
 import bcrypt from 'bcryptjs';
 import { random, authentication } from '../../helpers/index';
+import { has } from 'lodash';
 
 interface PatientData {
   therapist_Id: string;
@@ -60,7 +61,7 @@ export const addNewPatient = async (req: Request, res: Response) => {
     });
 
     const savedPatient = await newPatient.save();
-    res.status(201).json(savedPatient);
+    res.status(201).json({success: true, data: savedPatient});
   } catch (error) {
     res.status(400).json({ message: error.message });
   }
@@ -69,12 +70,11 @@ export const addNewPatient = async (req: Request, res: Response) => {
 
 export const getAllPatients = async (req: Request, res: Response) => {
   try {
-    const therapistId: string = req.params.therapistId;
-
+    const { sessionToken } = req.params;
     // Query the database to find patients associated with the therapist
-    const patients = await Patient.find({ therapist_Id: therapistId });
+    const patients = await Patient.find({ sessionToken: sessionToken, is_active: true }).sort({ created_at: 'desc' });
 
-    res.status(200).json(patients);
+    res.status(200).json({success: true, data: patients});
   } catch (error) {
     res.status(500).json({ message: 'Internal server error' });
   }
@@ -112,11 +112,24 @@ export const disablePatient = async (req: Request, res: Response) => {
     if (!updatedPatient) {
       return res.status(404).json({ message: 'Patient not found' });
     }
-    res.status(200).json(updatedPatient)
+    res.status(200).json({success: true, data: updatedPatient})
   } catch (error) {
   res.status(500).json({ message: 'Internal server error' });
 }
 }
+
+export const getPatient = async (req: Request, res: Response) => {
+  try {
+    const { patient_id } = req.params;
+    console.log(patient_id);
+    // Query the database to find patients associated with the therapist
+    const patient = await Patient.find({ _id: patient_id});
+
+    res.status(200).json({success: true, data: patient});
+  } catch (error) {
+    res.status(500).json({success: false, message: 'Internal server error' });
+  }
+};
 
   export const verifyEmail = async (req:Request, res:Response) => {
     try {
@@ -124,20 +137,21 @@ export const disablePatient = async (req: Request, res: Response) => {
       const getEmail = await Patient.find({ patient_email: email});
 
       if(!getEmail || getEmail.length === 0){
-        res.status(404).json({message: "Email not found"})
+        res.status(404).json({success: false, message: "Email not found"})
+        return
       }
       
-      res.status(200).json({message: "Email found Successful" , data:getEmail});
+      res.status(200).json({success: true, message: "Email found Successful" , data:getEmail});
 
     } catch (error) {
-      res.status(500).json({ message: 'Internal server error' });
+      res.status(500).json({success: false, message: 'Internal server error' });
     }
   }
 
 
   export const setPassword = async (req:Request, res:Response) => {
     try {
-      const {email} = req.params; 
+      const { password, email } = req.body;
       const getEmail = await Patient.find({ patient_email: email});
 
       if(!getEmail || getEmail.length === 0){
@@ -147,21 +161,18 @@ export const disablePatient = async (req: Request, res: Response) => {
       const patient = getEmail[0];
 
       if (patient.password) {
-          return res.status(409).json({ message: "Password already set" });
+          return res.status(409).json({ status: 409, success: true, message: "Password already set" });
       }
-
-      const { password } = req.body;
 
       const salt = random();
       const hashedPassword = authentication(salt, password);
+      console.log(hashedPassword)
+      const response = await Patient.updateOne({ _id: patient._id }, { password: hashedPassword, salt: salt });
 
-      const response = await Patient.updateOne({ _id: patient._id }, { password: hashedPassword });
-
-
-      res.status(200).json({ message: "Password updated successfully", data: response });
+      res.status(200).json({ status: 200, success: true, message: "Password updated successfully" });
       
     } catch (error) {
-      res.status(500).json({ message: 'Internal server error' });
+      res.status(500).json({success: false, message: 'Internal server error' });
     }
   }
 
@@ -169,27 +180,23 @@ export const disablePatient = async (req: Request, res: Response) => {
       try {
         const { email, password } = req.body;
 
-        console.log(email, password);
-
         if (!email || !password) {
-            return res.status(400).json({ message: 'Email and password are required.' });
+            return res.status(400).json({status: 400, success: false, message: 'Email and password are required.' });
         }
 
-        const user = await Patient.findOne( { patient_email: email} ).select('+.salt +.password');
+        const user = await Patient.findOne( { patient_email: email} ).select('+salt +password');
 
         if (!user) {
-            return res.status(409).json({ message: 'User not found.' });
+            return res.status(409).json({status: 409, success: false, message: 'User not found.' });
         }
 
         const expectedHash = authentication(user.salt, password);
 
         if(user.password != expectedHash){
-            return res.sendStatus(403);
+            return res.status(403).json({status: 403, success: false, message: "Password is not correct"});
         }
 
-        await user.save();
-
-        return res.status(200).json({ message: 'Login successful', user }).end();
+        return res.status(200).json({status: 200, success: true, message: 'Login successful', user }).end();
 
     } catch (error) {
         console.log('Error during login:', error);

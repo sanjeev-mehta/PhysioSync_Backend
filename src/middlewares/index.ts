@@ -27,28 +27,37 @@ export const isOwner = async (req: Request, res: Response, next: () => void) => 
 
 
 export const isAuthenticated = async (req: Request, res: Response, next: () => void) => {
-    try{
-        const sessionToken = req.cookies['physio-sync'];
+    try {
+        const authHeader = req.headers['authorization'];
+        console.log(authHeader)
+        if (!authHeader) {
+            return res.status(403).json({ status: 403, message: "User is not authenticated" });
+        }
 
-        if(!sessionToken){
-            return res.sendStatus(403);
+        const sessionToken = authHeader.split(' ')[1];
+
+        console.log(sessionToken);
+
+        if (!sessionToken) {
+            return res.status(403).json({ status: 403, message: "User is not authenticated" });
         }
 
         const existingUser = await getUserBySessionToken(sessionToken);
 
-        if(!existingUser){
-          return res.sendStatus(403);
+        if (!existingUser) {
+            return res.status(403).json({ status: 403, message: "User is not authenticated" });
         }
 
-        merge(req, {identity: existingUser});
+        merge(req, { identity: existingUser });
 
         return next();
-        
-    }catch(error){
+
+    } catch (error) {
         console.log(error);
-        return res.sendStatus(500);
+        return res.status(500).json({ status: 500, message: "Internal Server error" });
     }
-}
+};
+
 
 export const logout = async (req: Request, res: Response) => {
     try {
