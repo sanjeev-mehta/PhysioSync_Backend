@@ -25,7 +25,7 @@ const messageSchema = new Schema<IMessage>({
   receiver_id: { type: String, ref: 'User', required: true },
   message_text: { type: String, required: true },
   is_read: {type: Boolean, required: false},
-  is_media: {type: Boolean, required: false},
+  is_media: {type: Boolean, required: true},
   image_url: { type: String, required: false },
   video_url: { type: String, required: false },
   createdAt: { type: Date, default: Date.now },

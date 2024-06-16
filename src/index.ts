@@ -37,13 +37,14 @@ io.on('connection', (socket: Socket) => {
   });
 
   socket.on('send', async (data) => {
-    const { senderId, receiverId, message } = data;
+    const { senderId, receiverId, message, is_media } = data;
     try {
       const newMessage = await MessageModel.create({
         sender_id: senderId,
         receiver_id: receiverId,
         message_text: message,
-        is_read: false
+        is_read: false,
+        is_media: is_media
       });
       console.log('Message saved to database:', newMessage);
     } catch (error) {
