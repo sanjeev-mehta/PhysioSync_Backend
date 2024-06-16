@@ -35,7 +35,12 @@ io.on('connection', (socket: Socket) => {
   //   users[userId] = socket.id;;
   //   socket.broadcast.emit('user-joined', userId);
   // });
-  socket.on('send', async (data: { senderId: string, receiverId: string, message: string }) => {
+  socket.on('register', (userId) => {
+    socket.join(userId);
+    console.log(`User ${userId} joined room ${userId}`);
+  });
+
+  socket.on('send', async (data) => {
     const { senderId, receiverId, message } = data;
     try {
       const newMessage = await MessageModel.create({
@@ -47,14 +52,11 @@ io.on('connection', (socket: Socket) => {
     } catch (error) {
       console.error('Error saving message to database:', error);
     }
-    console.log(message, senderId);
-    const receiverSocketId = users[receiverId];
-    // if (receiverSocketId) {
-      // io.to(receiverSocketId).emit('receive', { sender: senderId, message });
-      io.to(receiverId).emit('receive', { sender: senderId, message });
-      // io.emit('receive', { sender: senderId, message });
-    // }
+
+    io.to(receiverId).emit('receive', { sender: senderId, message });
+    console.log(`Message sent to receiver ${receiverId}`);
   });
+  
   socket.on('disconnect', () => {
     const userId = Object.keys(users).find(key => users[key] === socket.id);
     if (userId) {
