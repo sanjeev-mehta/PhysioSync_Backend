@@ -10,6 +10,7 @@ interface AssignExerciseData {
   is_awaiting_reviews?: boolean;
   patient_video_url?: string;
   patient_exercise_completion_date_time?: Date;
+  therapist_id?: String;
 }
 
 interface EditAssignExerciseData {
@@ -20,6 +21,7 @@ interface EditAssignExerciseData {
   is_awaiting_reviews?: boolean;
   patient_video_url?: string;
   patient_exercise_completion_date_time?: Date;
+  therapist_id?: String;
 }
 
 export async function addassignExercise(data: AssignExerciseData) {
@@ -34,7 +36,8 @@ export async function addassignExercise(data: AssignExerciseData) {
       status = 'assigned',
       is_awaiting_reviews = false,
       patient_video_url,
-      patient_exercise_completion_date_time
+      patient_exercise_completion_date_time,
+      therapist_id
     } = data;
 
     const newAssignment = new Assignment({
@@ -45,7 +48,8 @@ export async function addassignExercise(data: AssignExerciseData) {
       status,
       is_awaiting_reviews,
       patient_video_url,
-      patient_exercise_completion_date_time
+      patient_exercise_completion_date_time,
+      therapist_id
     });
 
     await newAssignment.save();
@@ -98,6 +102,23 @@ export async function getAssignedExercise(id: string) {
     const assignment = await Assignment.find({patient_id: id, is_awaiting_reviews: false})
     .populate('exercise_id')
     .populate('patient_id');
+
+    if (!assignment) {
+      console.error("Assignment not found");
+      return { success: false, message: 'Assignment not found' };
+    }
+
+    return { success: true, message: 'Assignment found successfully', data: assignment };
+
+  } catch (error: any) {
+    console.error("Error getting assignment:", error.message);
+    return { success: false, message: 'Failed to get assignment' };
+  }
+}
+
+export async function getNotification(id: string) {
+  try {
+    const assignment = await Assignment.find({therapist_id: id, is_awaiting_reviews: false})
 
     if (!assignment) {
       console.error("Assignment not found");

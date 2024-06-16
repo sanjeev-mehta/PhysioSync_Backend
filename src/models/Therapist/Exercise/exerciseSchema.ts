@@ -10,6 +10,7 @@ interface IAssignment extends Document {
   is_awaiting_reviews?: boolean;
   patient_video_url?: string;
   patient_exercise_completion_date_time?: Date;
+  therapist_id: String;
 }
 
 const assignmentSchema: Schema<IAssignment> = new Schema({
@@ -50,6 +51,10 @@ const assignmentSchema: Schema<IAssignment> = new Schema({
   },
   patient_exercise_completion_date_time: {
     type: Date,
+    required: false
+  },
+  therapist_id: {
+    type: String,
     required: false
   }
 });
