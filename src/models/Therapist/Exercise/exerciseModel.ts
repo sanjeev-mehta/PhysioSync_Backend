@@ -6,24 +6,22 @@ interface AssignExerciseData {
   patient_id: mongoose.Types.ObjectId;
   start_date: Date;
   end_date: Date;
-  frequency: string;
   status?: 'assigned' | 'completed';
   is_awaiting_reviews?: boolean;
   patient_video_url?: string;
   patient_exercise_completion_date_time?: Date;
-  patient_watch_Data?: string;
+  therapist_id?: String;
 }
 
 interface EditAssignExerciseData {
   exercise_id?: mongoose.Types.ObjectId;
   start_date?: Date;
   end_date?: Date;
-  frequency?: string;
   status?: 'assigned' | 'completed';
   is_awaiting_reviews?: boolean;
   patient_video_url?: string;
   patient_exercise_completion_date_time?: Date;
-  patient_watch_Data?: string;
+  therapist_id?: String;
 }
 
 export async function addassignExercise(data: AssignExerciseData) {
@@ -35,12 +33,11 @@ export async function addassignExercise(data: AssignExerciseData) {
       patient_id,
       start_date,
       end_date,
-      frequency,
       status = 'assigned',
       is_awaiting_reviews = false,
       patient_video_url,
       patient_exercise_completion_date_time,
-      patient_watch_Data
+      therapist_id
     } = data;
 
     const newAssignment = new Assignment({
@@ -48,12 +45,11 @@ export async function addassignExercise(data: AssignExerciseData) {
       patient_id,
       start_date,
       end_date,
-      frequency,
       status,
       is_awaiting_reviews,
       patient_video_url,
       patient_exercise_completion_date_time,
-      patient_watch_Data
+      therapist_id
     });
 
     await newAssignment.save();
@@ -82,12 +78,10 @@ export async function editAssignExercise(id: string, newData: EditAssignExercise
     if (newData.exercise_id) assignment.exercise_id = newData.exercise_id;
     if (newData.start_date) assignment.start_date = newData.start_date;
     if (newData.end_date) assignment.end_date = newData.end_date;
-    if (newData.frequency) assignment.frequency = newData.frequency;
     if (newData.status) assignment.status = newData.status;
     if (newData.is_awaiting_reviews !== undefined) assignment.is_awaiting_reviews = newData.is_awaiting_reviews;
     if (newData.patient_video_url) assignment.patient_video_url = newData.patient_video_url;
     if (newData.patient_exercise_completion_date_time) assignment.patient_exercise_completion_date_time = newData.patient_exercise_completion_date_time;
-    if (newData.patient_watch_Data) assignment.patient_watch_Data = newData.patient_watch_Data;
 
     await assignment.save();
 
@@ -105,9 +99,26 @@ export async function getAssignedExercise(id: string) {
   console.log("Received Assignment ID for getting Assignment:", id);
 
   try {
-    const assignment = await Assignment.findById(id);
-    // .populate('exercise_id')
-    // .populate('patient_id');
+    const assignment = await Assignment.find({patient_id: id, is_awaiting_reviews: false})
+    .populate('exercise_id')
+    .populate('patient_id');
+
+    if (!assignment) {
+      console.error("Assignment not found");
+      return { success: false, message: 'Assignment not found' };
+    }
+
+    return { success: true, message: 'Assignment found successfully', data: assignment };
+
+  } catch (error: any) {
+    console.error("Error getting assignment:", error.message);
+    return { success: false, message: 'Failed to get assignment' };
+  }
+}
+
+export async function getNotification(id: string) {
+  try {
+    const assignment = await Assignment.find({therapist_id: id, is_awaiting_reviews: false})
 
     if (!assignment) {
       console.error("Assignment not found");

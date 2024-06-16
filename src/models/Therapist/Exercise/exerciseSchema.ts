@@ -6,12 +6,11 @@ interface IAssignment extends Document {
   assigned_at: Date;
   start_date: Date;
   end_date: Date;
-  frequency: string;
-  status?: 'assigned' | 'completed';
+  status?: 'assigned' | 'completed' | 'reviewed';
   is_awaiting_reviews?: boolean;
   patient_video_url?: string;
   patient_exercise_completion_date_time?: Date;
-  patient_watch_Data?: string;
+  therapist_id: String;
 }
 
 const assignmentSchema: Schema<IAssignment> = new Schema({
@@ -22,7 +21,7 @@ const assignmentSchema: Schema<IAssignment> = new Schema({
   },
   patient_id: {
     type: Schema.Types.ObjectId,
-    ref: 'patient',
+    ref: 'Patients',
     required: true
   },
   assigned_at: {
@@ -35,10 +34,6 @@ const assignmentSchema: Schema<IAssignment> = new Schema({
   },
   end_date: {
     type: Date,
-    required: true
-  },
-  frequency: {
-    type: String,
     required: true
   },
   status: {
@@ -58,14 +53,14 @@ const assignmentSchema: Schema<IAssignment> = new Schema({
     type: Date,
     required: false
   },
-  patient_watch_Data: {
+  therapist_id: {
     type: String,
     required: false
   }
 });
 
 // Create and export the model
-const Assignment = mongoose.model<IAssignment>('Exercise Data', assignmentSchema);
+const Assignment = mongoose.model<IAssignment>('Assigned Exercise', assignmentSchema);
 
 export default Assignment;
 export type { IAssignment };

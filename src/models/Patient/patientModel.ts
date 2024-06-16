@@ -37,8 +37,7 @@ const PatientSchema: Schema = new Schema({
   medical_history: { type: String },
   created_at: { type: Date, default: Date.now },
   updated_at: { type: Date, default: Date.now },
-  is_active: { type: Boolean, default: true } 
-
+  is_active: { type: Boolean, default: true }
 });
 
 const Patient = mongoose.model<IPatient>('Patients', PatientSchema);
