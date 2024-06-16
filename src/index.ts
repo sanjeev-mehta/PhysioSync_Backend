@@ -30,11 +30,7 @@ interface User {
 const users: User = {};
 io.on('connection', (socket: Socket) => {
   console.log('A user connected:', socket.id);
-  // socket.on('new-user-joined', (userId: string) => {
-  //   console.log("New user joined:", userId);
-  //   users[userId] = socket.id;;
-  //   socket.broadcast.emit('user-joined', userId);
-  // });
+
   socket.on('register', (userId) => {
     socket.join(userId);
     console.log(`User ${userId} joined room ${userId}`);
@@ -47,6 +43,7 @@ io.on('connection', (socket: Socket) => {
         sender_id: senderId,
         receiver_id: receiverId,
         message_text: message,
+        is_read: false
       });
       console.log('Message saved to database:', newMessage);
     } catch (error) {
@@ -55,6 +52,16 @@ io.on('connection', (socket: Socket) => {
 
     io.to(receiverId).emit('receive', { sender: senderId, message });
     console.log(`Message sent to receiver ${receiverId}`);
+  });
+
+  socket.on('messageRead', async (data) => {
+    const { messageId } = data;
+    try {
+      await MessageModel.findByIdAndUpdate(messageId, { is_read: true });
+      console.log(`Message ${messageId} marked as read`);
+    } catch (error) {
+      console.error('Error updating message status:', error);
+    }
   });
   
   socket.on('disconnect', () => {
