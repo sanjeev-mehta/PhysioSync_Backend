@@ -26,22 +26,35 @@ interface User {
 
 const users: User = {};
 
+const onlineUsers: Set<string> = new Set();
+
+const updateOnlineUsers = () => {
+  io.emit('onlineUsers', Array.from(onlineUsers));
+};
+
 io.on('connection', (socket: Socket) => {
   console.log('A user connected:', socket.id);
 
   socket.on('register', (userId) => {
+    // users[userId] = socket.id;
+  onlineUsers.add(userId);
     socket.join(userId);
     console.log(`User ${userId} joined room ${userId}`);
   });
 
+  socket.on('getOnlineUsers', () => {
+    socket.emit('onlineUsers', Array.from(onlineUsers));
+  });
+
   socket.on('send', async (data) => {
-    const { senderId, receiverId, message } = data;
+    const { senderId, receiverId, message, is_media } = data;
     try {
       const newMessage = await MessageModel.create({
         sender_id: senderId,
         receiver_id: receiverId,
         message_text: message,
-        is_read: false
+        is_read: false,
+        is_media: is_media
       });
       console.log('Message saved to database:', newMessage);
     } catch (error) {
@@ -52,22 +65,48 @@ io.on('connection', (socket: Socket) => {
     console.log(`Message sent to receiver ${receiverId}`);
   });
 
-  socket.on('messageRead', async (data) => {
-    const { messageId } = data;
+  socket.on('messageRead', async (messageIds) => {
     try {
-      await MessageModel.findByIdAndUpdate(messageId, { is_read: true });
-      console.log(`Message ${messageId} marked as read`);
+        await MessageModel.updateMany(
+            { _id: { $in: messageIds } },
+            { is_read: true }
+        );
+        console.log(`Messages ${messageIds.join(', ')} marked as read`);
+        socket.emit('messageReadResponse', { success: true });
     } catch (error) {
-      console.error('Error updating message status:', error);
+        console.error('Error updating message statuses:', error);
+        socket.emit('messageReadResponse', { success: false });
+    }
+});
+
+  socket.on('fetchPreviousMessages', async (data) => {
+    const { senderId, receiverId } = data;
+    try {
+      const messages = await MessageModel.find({
+        $or: [
+          { sender_id: senderId, receiver_id: receiverId },
+          { sender_id: receiverId, receiver_id: senderId }
+        ]
+      }).sort({ createdAt: -1 }).limit(100); 
+      socket.emit('previousMessages', messages);
+      console.log(`Fetched previous messages for ${senderId} and ${receiverId}`);
+    } catch (error) {
+      console.error('Error fetching previous messages:', error);
     }
   });
+
   
+
   socket.on('disconnect', () => {
     const userId = Object.keys(users).find(key => users[key] === socket.id);
     if (userId) {
-      console.log(`${userId} left`);
-      socket.broadcast.emit('left', userId);
       delete users[userId];
+      onlineUsers.delete(userId);
+
+      console.log(`${userId} left`);
+      updateOnlineUsers();
+
+      socket.broadcast.emit('left', userId);
     }
   });
 });

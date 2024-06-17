@@ -24,7 +24,7 @@ const messageSchema = new Schema<IMessage>({
   sender_id: { type: String, ref: 'User', required: true },
   receiver_id: { type: String, ref: 'User', required: true },
   message_text: { type: String, required: true },
-  is_read: {type: Boolean, required: true},
+  is_read: {type: Boolean, required: false},
   is_media: {type: Boolean, required: true},
   image_url: { type: String, required: false },
   video_url: { type: String, required: false },
@@ -36,6 +36,6 @@ const messageSchema = new Schema<IMessage>({
 
 });
 
-const MessageModel = model<IMessage>('Message-test', messageSchema);
+const MessageModel = model<IMessage>('message-physio', messageSchema);
 
 export default MessageModel;
