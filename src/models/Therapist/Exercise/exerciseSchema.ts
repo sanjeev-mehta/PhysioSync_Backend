@@ -1,7 +1,7 @@
 import mongoose, { Document, Schema } from 'mongoose';
 
 interface IAssignment extends Document {
-  exercise_id: mongoose.Types.ObjectId;
+  exercise_ids: mongoose.Types.ObjectId[];
   patient_id: mongoose.Types.ObjectId;
   assigned_at: Date;
   start_date: Date;
@@ -14,11 +14,11 @@ interface IAssignment extends Document {
 }
 
 const assignmentSchema: Schema<IAssignment> = new Schema({
-  exercise_id: {
+  exercise_ids: [{
     type: Schema.Types.ObjectId,
     ref: 'exercises',
     required: true
-  },
+  }],
   patient_id: {
     type: Schema.Types.ObjectId,
     ref: 'Patients',

@@ -14,7 +14,7 @@ export const createExercise = async (req: Request, res: Response): Promise<void>
       });
       const savedExercise = await newExercise.save();
       console.log("New exercise added successfully !")
-      res.status(201).json({ message: 'Exercise has been added', success: true });
+      res.status(201).json({ message: 'Exercise has been added', success: true, data: savedExercise });
     } catch (error) {
       console.error('Error creating exercise:', error);
       res.status(500).json({ message: 'Internal Server Error', success: false});

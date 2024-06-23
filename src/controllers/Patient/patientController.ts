@@ -6,6 +6,8 @@ import { random, authentication } from '../../helpers/index';
 import { has } from 'lodash';
 import NotificationReminder from '../../models/Patient/notification';
 import mongoose  from 'mongoose';
+import Therapist from '../../models/Therapist/therapistSignupSchema';
+import messages from 'router/messages/messages';
 
 
 
@@ -71,18 +73,28 @@ export const addNewPatient = async (req: Request, res: Response) => {
   }
 };
 
-
 export const getAllPatients = async (req: Request, res: Response) => {
   try {
     const { sessionToken } = req.params;
-    // Query the database to find patients associated with the therapist
-    const patients = await Patient.find({ sessionToken: sessionToken, is_active: true }).sort({ created_at: 'desc' });
 
-    res.status(200).json({success: true, data: patients});
+    // if (!sessionToken) {
+    //   return res.status(409).json({ success: false, message: "Session token not found" });
+    // }
+
+    const therapist = await Therapist.findOne({ sessionToken: sessionToken });
+
+    if (!therapist || !therapist._id) {
+      return res.status(409).json({ success: false, message: "Therapist not found" });
+    }
+
+    const patients = await Patient.find({ therapist_Id: therapist._id, is_active: true }).sort({ created_at: 'desc' });
+
+    return res.status(200).json({ success: true, data: patients });
   } catch (error) {
-    res.status(500).json({ message: 'Internal server error' });
+    return res.status(500).json({ message: 'Internal server error' });
   }
 };
+
 
 
 export const updatePatient = async (req: Request, res: Response) => {

@@ -2,7 +2,7 @@ import Assignment, { IAssignment } from './exerciseSchema';
 import mongoose from 'mongoose';
 
 interface AssignExerciseData {
-  exercise_id: mongoose.Types.ObjectId;
+  exercise_ids: mongoose.Types.ObjectId[];
   patient_id: mongoose.Types.ObjectId;
   start_date: Date;
   end_date: Date;
@@ -14,7 +14,7 @@ interface AssignExerciseData {
 }
 
 interface EditAssignExerciseData {
-  exercise_id?: mongoose.Types.ObjectId;
+  exercise_ids?: mongoose.Types.ObjectId[];
   start_date?: Date;
   end_date?: Date;
   status?: 'assigned' | 'completed';
@@ -29,7 +29,7 @@ export async function addassignExercise(data: AssignExerciseData) {
 
   try {
     const {
-      exercise_id,
+      exercise_ids,
       patient_id,
       start_date,
       end_date,
@@ -41,7 +41,7 @@ export async function addassignExercise(data: AssignExerciseData) {
     } = data;
 
     const newAssignment = new Assignment({
-      exercise_id,
+      exercise_ids,
       patient_id,
       start_date,
       end_date,
@@ -75,7 +75,7 @@ export async function editAssignExercise(id: string, newData: EditAssignExercise
       return { success: false, message: 'Assignment not found' };
     }
 
-    if (newData.exercise_id) assignment.exercise_id = newData.exercise_id;
+    if (newData.exercise_ids) assignment.exercise_ids = newData.exercise_ids;
     if (newData.start_date) assignment.start_date = newData.start_date;
     if (newData.end_date) assignment.end_date = newData.end_date;
     if (newData.status) assignment.status = newData.status;
@@ -100,10 +100,10 @@ export async function getAssignedExercise(id: string) {
 
   try {
     const assignment = await Assignment.find({patient_id: id, is_awaiting_reviews: false})
-    .populate('exercise_id')
+    .populate('exercise_ids')
     .populate('patient_id');
 
-    if (!assignment) {
+    if (assignment.length === 0) {
       console.error("Assignment not found");
       return { success: false, message: 'Assignment not found' };
     }
