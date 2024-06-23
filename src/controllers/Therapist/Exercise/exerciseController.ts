@@ -1,5 +1,6 @@
 import { Request, Response } from "express";
 import { addassignExercise, editAssignExercise, getAssignedExercise, getNotification } from "../../../models/Therapist/Exercise/exerciseModel";
+import Patient from '../../../models/Patient/patientModel';
 
 export const addAssignmentExercise = async (req: Request, res: Response) => {
   try {
@@ -66,19 +67,40 @@ export const getAssignmentExercise = async (req: Request, res: Response) => {
 
     console.log('Received ID for getting assignment:', patient_id);
 
-    const result = await getAssignedExercise(patient_id);
+    // Fetch assigned exercises and patient details concurrently
+    const [exerciseResult, patientResult] = await Promise.all([
+      getAssignedExercise(patient_id),
+      Patient.findById(patient_id).exec()
+    ]);
 
-    if (result && result.success) {
-      res.status(200).json({ status: 200, success: true, message: result.message, data: result.data });
-    } else {
-      res.status(404).json({ status: 404, success: false, error: result.message });
+    // Handle case where patient is not found
+    if (!patientResult) {
+      return res.status(404).json({ status: 404, success: false, error: 'Patient not found' });
     }
+
+    // Handle case where assigned exercises retrieval fails
+    if (!exerciseResult || !exerciseResult.success) {
+      return res.status(404).json({ status: 404, success: false, error: exerciseResult?.message || 'Assigned exercises not found' });
+    }
+
+    // Create the wholeData object
+    const wholeData = {
+      exercises: exerciseResult.data
+    };
+
+    // Return combined data
+    res.status(200).json({ 
+      status: 200, 
+      success: true, 
+      message: exerciseResult.message, 
+      data: wholeData 
+    });
+
   } catch (error: any) {
     console.error('Error in getAssignment controller:', error.message);
     res.status(500).json({ status: 500, success: false, error: 'Internal Server Error' });
   }
 };
-
 export const getTherapistNotification = async (req: Request, res: Response) => {
   try {
     const { therapist_id } = req.params;
