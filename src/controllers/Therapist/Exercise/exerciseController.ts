@@ -196,9 +196,16 @@ export const addAssignmentExercise = async (req: Request, res: Response) => {
 
 export const getTherapistNotification = async (req: Request, res: Response) => {
   try {
-    const { therapist_id } = req.params;
+    const {sessionToken} = req.params;
+    
+    const therapist = await Therapist.findOne({ sessionToken: sessionToken });
 
-    const result = await getNotification(therapist_id);
+    if (!therapist) {
+      res.status(404).json({ success: false, message: 'Therapist not found please login again ' });
+      return
+    }
+
+    const result = await getNotification(therapist._id as string);
 
     if (result && result.success) {
       res.status(200).json({ status: 200, success: true, message: result.message, data: result.data });
