@@ -1,5 +1,6 @@
 import Assignment, { IAssignment } from './exerciseSchema'; 
 import mongoose from 'mongoose';
+import Patient from '../../../models/Patient/patientModel';
 
 interface AssignExerciseData {
   exercise_ids: mongoose.Types.ObjectId[];
@@ -99,16 +100,17 @@ export async function getAssignedExercise(id: string) {
   console.log("Received Assignment ID for getting Assignment:", id);
 
   try {
+    const patient = await Patient.findById(id);
     const assignment = await Assignment.find({patient_id: id, is_awaiting_reviews: false})
     .populate('exercise_ids')
-    .populate('patient_id');
 
-    if (assignment.length === 0) {
+    console.log(patient);
+    if (patient === null) {
       console.error("Assignment not found");
-      return { success: false, message: 'Assignment not found' };
+      return { success: false, message: 'Patient not found' };
     }
 
-    return { success: true, message: 'Assignment found successfully', data: assignment };
+    return { data: {exercise: assignment, patient: patient} };
 
   } catch (error: any) {
     console.error("Error getting assignment:", error.message);

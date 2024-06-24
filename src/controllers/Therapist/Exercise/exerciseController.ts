@@ -141,7 +141,7 @@ export const addAssignmentExercise = async (req: Request, res: Response) => {
 
       res.status(200).json({ 
       success: true, 
-      message: data.message,
+      message: 'Assignment found successfully',
       data: data 
     });
 
