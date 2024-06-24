@@ -5,7 +5,7 @@ export interface IPatient extends Document {
   first_name: string;
   last_name: string;
   patient_email: string;
-  injury_details: string;
+  injury_details?: string;
   password: string;
   salt: string;
   exercise_reminder_time: string;
@@ -24,13 +24,15 @@ const PatientSchema: Schema = new Schema({
   therapist_Id: { type: String, required: true },
   first_name: { type: String, required: true },
   last_name: { type: String, required: true },
+  phone_no: { type: String, required: true},
+  address: {type: String, required: true},
   patient_email: { type: String, required: true, unique: true },
-  injury_details: { type: String, required: true },
+  injury_details: { type: String, required: false},
   password: { type: String, required: false },
   salt: { type: String, required: false, select: false },
-  exercise_reminder_time: { type: String, required: true },
-  medicine_reminder_time: { type: String, required: true },
-  date_of_birth: { type: Date, required: true },
+  exercise_reminder_time: { type: String, required: false },
+  medicine_reminder_time: { type: String, required: false },
+  date_of_birth: { type: Date, required: false },
   allergy_if_any: { type: String },
   profile_photo: { type: String },
   gender: { type: String, required: true },

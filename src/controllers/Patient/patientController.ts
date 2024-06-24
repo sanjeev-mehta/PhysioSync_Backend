@@ -17,6 +17,8 @@ interface PatientData {
   last_name: string;
   patient_email: string;
   injury_details: string;
+  phone_no: string;
+  address: string;
   exercise_reminder_time: string;
   medicine_reminder_time: string;
   password: string;
@@ -30,11 +32,21 @@ interface PatientData {
 }
 
 export const addNewPatient = async (req: Request, res: Response) => {
+
+  const {sessionToken} = req.params;
+
   try {
+    const therapist = await Therapist.findOne({ sessionToken: sessionToken });
+
+    if (!therapist) {
+      return res.status(404).json({ message: 'Therapist not found' });
+    }
+
     const {
-      therapist_Id,
       first_name,
       last_name,
+      phone_no,
+      address,
       patient_email,
       injury_details,
       exercise_reminder_time,
@@ -47,12 +59,14 @@ export const addNewPatient = async (req: Request, res: Response) => {
       is_active = true
     }: PatientData = req.body;
 
-     const salt = random();
+    const salt = random();
 
     const newPatient = new Patient({
-      therapist_Id,
+      therapist_Id: therapist._id,
       first_name,
       last_name,
+      phone_no,
+      address,
       patient_email,
       injury_details,
       exercise_reminder_time,
@@ -67,9 +81,9 @@ export const addNewPatient = async (req: Request, res: Response) => {
     });
 
     const savedPatient = await newPatient.save();
-    res.status(201).json({success: true, data: savedPatient});
+    res.status(201).json({ success: true, data: savedPatient });
   } catch (error) {
-    res.status(400).json({ message: error.message });
+    res.status(500).json({ message: error.message });
   }
 };
 
