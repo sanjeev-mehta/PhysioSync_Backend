@@ -39,7 +39,8 @@ export const addNewPatient = async (req: Request, res: Response) => {
     const therapist = await Therapist.findOne({ sessionToken: sessionToken });
 
     if (!therapist) {
-      return res.status(404).json({ success: false, message: 'Therapist not found please login again ' });
+      res.status(404).json({ success: false, message: 'Therapist not found please login again ' });
+      return
     }
 
     const {
@@ -83,7 +84,8 @@ export const addNewPatient = async (req: Request, res: Response) => {
     const savedPatient = await newPatient.save();
 
     if(!savedPatient){
-      return res.status(409).json({ success: false, message: 'Patient not saved'})
+       res.status(409).json({ success: false, message: 'Patient not saved'})
+       return
     }
 
     res.status(201).json({ success: true, message: "Patient created successfully", data: savedPatient });
