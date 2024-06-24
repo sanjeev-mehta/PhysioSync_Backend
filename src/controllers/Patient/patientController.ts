@@ -23,7 +23,7 @@ interface PatientData {
   medicine_reminder_time: string;
   password: string;
   salt: string;
-  date_of_birth: Date;
+  date_of_birth: string;
   allergy_if_any?: string;
   profile_photo?: string;
   gender: string;
@@ -39,7 +39,7 @@ export const addNewPatient = async (req: Request, res: Response) => {
     const therapist = await Therapist.findOne({ sessionToken: sessionToken });
 
     if (!therapist) {
-      return res.status(404).json({ message: 'Therapist not found' });
+      return res.status(404).json({ success: false, message: 'Therapist not found please login again ' });
     }
 
     const {
@@ -81,9 +81,14 @@ export const addNewPatient = async (req: Request, res: Response) => {
     });
 
     const savedPatient = await newPatient.save();
-    res.status(201).json({ success: true, data: savedPatient });
+
+    if(!savedPatient){
+      return res.status(409).json({ success: false, message: 'Patient not saved'})
+    }
+
+    res.status(201).json({ success: true, message: "Patient created successfully", data: savedPatient });
   } catch (error) {
-    res.status(500).json({ message: error.message });
+    res.status(500).json({ success: true, message: error.message });
   }
 };
 
@@ -91,19 +96,19 @@ export const getAllPatients = async (req: Request, res: Response) => {
   try {
     const { sessionToken } = req.params;
 
-    // if (!sessionToken) {
-    //   return res.status(409).json({ success: false, message: "Session token not found" });
-    // }
+    if (sessionToken === null) {
+      return res.status(409).json({ success: false, message: "Session token not found" });
+    }
 
     const therapist = await Therapist.findOne({ sessionToken: sessionToken });
 
     if (!therapist || !therapist._id) {
-      return res.status(409).json({ success: false, message: "Therapist not found" });
+      return res.status(409).json({ success: false, message: "Therapist not found login again" });
     }
 
     const patients = await Patient.find({ therapist_Id: therapist._id, is_active: true }).sort({ created_at: 'desc' });
 
-    return res.status(200).json({ success: true, data: patients });
+  return res.status(200).json({ success: true, message: "Patients found successfully", data: patients });
   } catch (error) {
     return res.status(500).json({ message: 'Internal server error' });
   }
@@ -123,7 +128,8 @@ export const updatePatient = async (req: Request, res: Response) => {
       return res.status(404).json({ message: 'Patient not found' });
     }
 
-    res.status(200).json(updatedPatient);
+    res.status(200).json({success:true, message:"patient updated succesfully", data:updatedPatient});
+  
   } catch (error) {
     res.status(500).json({ message: 'Internal server error' });
   }
@@ -142,7 +148,9 @@ export const disablePatient = async (req: Request, res: Response) => {
     if (!updatedPatient) {
       return res.status(404).json({ message: 'Patient not found' });
     }
-    res.status(200).json({success: true, data: updatedPatient})
+
+    res.status(200).json({success: true, message:"Patient disabled succefully", data: updatedPatient})
+  
   } catch (error) {
   res.status(500).json({ message: 'Internal server error' });
 }
@@ -155,7 +163,7 @@ export const getPatient = async (req: Request, res: Response) => {
     // Query the database to find patients associated with the therapist
     const patient = await Patient.find({ _id: patient_id});
 
-    res.status(200).json({success: true, data: patient});
+    res.status(200).json({success: true, message: "Patient fetched successfully", data: patient});
   } catch (error) {
     res.status(500).json({success: false, message: 'Internal server error' });
   }

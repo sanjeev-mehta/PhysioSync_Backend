@@ -2,6 +2,7 @@ import { Request, Response } from 'express';
 import addExerciseModel from '../../../models/exercise/exercises_model';
 import { addassignExercise, editAssignExercise, getAssignedExercise, getNotification } from '../../../models/Therapist/Exercise/exerciseModel';
 import Patient from '../../../models/Patient/patientModel';
+import messages from 'router/messages/messages';
 
 export const createExercise = async (req: Request, res: Response): Promise<void> => {
     try {
@@ -135,34 +136,13 @@ export const addAssignmentExercise = async (req: Request, res: Response) => {
       const { patient_id } = req.params;
   
       console.log('Received ID for getting assignment:', patient_id);
-  
-      // Fetch assigned exercises and patient details concurrently
-      const [exerciseResult, patientResult] = await Promise.all([
-        getAssignedExercise(patient_id),
-        Patient.findById(patient_id).exec()
-      ]);
-  
-      // Handle case where patient is not found
-      if (!patientResult) {
-        return res.status(404).json({ status: 404, success: false, error: 'Patient not found' });
-      }
 
-    // Handle case where assigned exercises retrieval fails
-    if (!exerciseResult || !exerciseResult.success) {
-      return res.status(404).json({ status: 404, success: false, error: exerciseResult?.message || 'Assigned exercises not found' });
-    }
+      const data = await getAssignedExercise(patient_id)
 
-    // Create the wholeData object
-    const wholeData = {
-      exercises: exerciseResult.data
-    };
-
-    // Return combined data
-    res.status(200).json({ 
-      status: 200, 
+      res.status(200).json({ 
       success: true, 
-      message: exerciseResult.message, 
-      data: wholeData 
+      message: data.message,
+      data: data 
     });
 
   } catch (error: any) {
