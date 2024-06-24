@@ -7,8 +7,7 @@ import cors from 'cors';
 import { Server, Socket } from 'socket.io';
 import router from './router/index';
 import connectDB from './config/dbconfig';
-import MessageModel from './models/messages/messages';
-
+import { MessageModel } from './models/messages/messages';
 
 const app = express();
 const server = http.createServer(app);
@@ -121,13 +120,20 @@ app.use(cookieParser());
 app.use(bodyparser.json());
 app.use('/', router());
 
+app.use('/', (req, res)=>{
+  res.status(200).json("Hi there");
+});
+
+const myPort = process.env.myPort;
+
 const startServer = async () => {
   await connectDB();
 
-  server.listen(8080, '0.0.0.0', () => {
-    console.log('Server running on http://35.182.100.191:8080/');
+  server.listen(myPort, () => {
+    console.log(`Server running on http://localhost:${myPort}`);
   });
 };
+
 startServer().catch((err) => {
   console.error('Failed to start server:', err);
 });

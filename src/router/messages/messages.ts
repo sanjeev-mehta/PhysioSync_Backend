@@ -1,13 +1,11 @@
-
-
 import  { Router } from 'express';
-import { createMessage } from '../../controllers/messages/messages';
+import { createChat, createMessage, findChat, findUserChats, getMessages, unreadMessages } from '../../controllers/messages/messages';
 
 export default (router: Router) => {
-
-// Route to create a new message
 router.post('/new_messages', createMessage);
-
-// Route to get all messages
-// router.get('/messages', getAllMessages);
+router.get('/unread_count/:receiverId', unreadMessages);
+router.post("/create-chat", createChat);
+router.get("/:userId", findUserChats);
+router.get("/find/:firstId/:secondId", findChat);
+router.get("/get-message/:chatId", getMessages);
 }

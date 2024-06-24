@@ -6,6 +6,8 @@ import { random, authentication } from '../../helpers/index';
 import { has } from 'lodash';
 import NotificationReminder from '../../models/Patient/notification';
 import mongoose  from 'mongoose';
+import Therapist from '../../models/Therapist/therapistSignupSchema';
+import messages from 'router/messages/messages';
 
 
 
@@ -15,11 +17,13 @@ interface PatientData {
   last_name: string;
   patient_email: string;
   injury_details: string;
+  phone_no: string;
+  address: string;
   exercise_reminder_time: string;
   medicine_reminder_time: string;
   password: string;
   salt: string;
-  date_of_birth: Date;
+  date_of_birth: string;
   allergy_if_any?: string;
   profile_photo?: string;
   gender: string;
@@ -28,11 +32,22 @@ interface PatientData {
 }
 
 export const addNewPatient = async (req: Request, res: Response) => {
+
+  const {sessionToken} = req.params;
+
   try {
+    const therapist = await Therapist.findOne({ sessionToken: sessionToken });
+
+    if (!therapist) {
+      res.status(404).json({ success: false, message: 'Therapist not found please login again ' });
+      return
+    }
+
     const {
-      therapist_Id,
       first_name,
       last_name,
+      phone_no,
+      address,
       patient_email,
       injury_details,
       exercise_reminder_time,
@@ -45,12 +60,14 @@ export const addNewPatient = async (req: Request, res: Response) => {
       is_active = true
     }: PatientData = req.body;
 
-     const salt = random();
+    const salt = random();
 
     const newPatient = new Patient({
-      therapist_Id,
+      therapist_Id: therapist._id,
       first_name,
       last_name,
+      phone_no,
+      address,
       patient_email,
       injury_details,
       exercise_reminder_time,
@@ -65,24 +82,40 @@ export const addNewPatient = async (req: Request, res: Response) => {
     });
 
     const savedPatient = await newPatient.save();
-    res.status(201).json({success: true, data: savedPatient});
+
+    if(!savedPatient){
+       res.status(409).json({ success: false, message: 'Patient not saved'})
+       return
+    }
+
+    res.status(201).json({ success: true, message: "Patient created successfully", data: savedPatient });
   } catch (error) {
-    res.status(400).json({ message: error.message });
+    res.status(500).json({ success: true, message: error.message });
   }
 };
-
 
 export const getAllPatients = async (req: Request, res: Response) => {
   try {
     const { sessionToken } = req.params;
-    // Query the database to find patients associated with the therapist
-    const patients = await Patient.find({ sessionToken: sessionToken, is_active: true }).sort({ created_at: 'desc' });
 
-    res.status(200).json({success: true, data: patients});
+    if (sessionToken === null) {
+      return res.status(409).json({ success: false, message: "Session token not found" });
+    }
+
+    const therapist = await Therapist.findOne({ sessionToken: sessionToken });
+
+    if (!therapist || !therapist._id) {
+      return res.status(409).json({ success: false, message: "Therapist not found login again" });
+    }
+
+    const patients = await Patient.find({ therapist_Id: therapist._id, is_active: true }).sort({ created_at: 'desc' });
+
+  return res.status(200).json({ success: true, message: "Patients found successfully", data: patients });
   } catch (error) {
-    res.status(500).json({ message: 'Internal server error' });
+    return res.status(500).json({ message: 'Internal server error' });
   }
 };
+
 
 
 export const updatePatient = async (req: Request, res: Response) => {
@@ -97,7 +130,8 @@ export const updatePatient = async (req: Request, res: Response) => {
       return res.status(404).json({ message: 'Patient not found' });
     }
 
-    res.status(200).json(updatedPatient);
+    res.status(200).json({success:true, message:"patient updated succesfully", data:updatedPatient});
+  
   } catch (error) {
     res.status(500).json({ message: 'Internal server error' });
   }
@@ -116,7 +150,9 @@ export const disablePatient = async (req: Request, res: Response) => {
     if (!updatedPatient) {
       return res.status(404).json({ message: 'Patient not found' });
     }
-    res.status(200).json({success: true, data: updatedPatient})
+
+    res.status(200).json({success: true, message:"Patient disabled succefully", data: updatedPatient})
+  
   } catch (error) {
   res.status(500).json({ message: 'Internal server error' });
 }
@@ -129,7 +165,7 @@ export const getPatient = async (req: Request, res: Response) => {
     // Query the database to find patients associated with the therapist
     const patient = await Patient.find({ _id: patient_id});
 
-    res.status(200).json({success: true, data: patient});
+    res.status(200).json({success: true, message: "Patient fetched successfully", data: patient});
   } catch (error) {
     res.status(500).json({success: false, message: 'Internal server error' });
   }
@@ -190,6 +226,12 @@ export const getPatient = async (req: Request, res: Response) => {
 
         const user = await Patient.findOne( { patient_email: email} ).select('+salt +password');
 
+
+        const Token = {
+          Access_Key: process.env.Access_Key,
+          Secret_access_key: process.env.Secret_access_key
+      }
+
         if (!user) {
             return res.status(409).json({status: 409, success: false, message: 'User not found.' });
         }
@@ -200,7 +242,7 @@ export const getPatient = async (req: Request, res: Response) => {
             return res.status(403).json({status: 403, success: false, message: "Password is not correct"});
         }
 
-        return res.status(200).json({status: 200, success: true, message: 'Login successful', user }).end();
+        return res.status(200).json({status: 200, success: true, message: 'Login successful', data:user, token: Token }).end();
 
     } catch (error) {
         console.log('Error during login:', error);
