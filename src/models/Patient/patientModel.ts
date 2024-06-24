@@ -32,7 +32,7 @@ const PatientSchema: Schema = new Schema({
   salt: { type: String, required: false, select: false },
   exercise_reminder_time: { type: String, required: false },
   medicine_reminder_time: { type: String, required: false },
-  date_of_birth: { type: String, required: false },
+  date_of_birth: { type: String, required: true },
   allergy_if_any: { type: String },
   profile_photo: { type: String },
   gender: { type: String, required: true },

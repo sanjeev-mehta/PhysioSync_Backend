@@ -110,7 +110,7 @@ export async function getAssignedExercise(id: string) {
       return { success: false, message: 'Patient not found' };
     }
 
-    return { data: {exercise: assignment, patient: patient} };
+    return {exercise: assignment, patient: patient};
 
   } catch (error: any) {
     console.error("Error getting assignment:", error.message);
