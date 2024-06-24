@@ -61,10 +61,13 @@ export const isAuthenticated = async (req: Request, res: Response, next: () => v
 
 export const logout = async (req: Request, res: Response) => {
     try {
+        
         if (!req.cookies['physio-sync']) {
             return res.status(409).json({ status: 409, success: false, message: "Login First" });
         }
+
         res.clearCookie('physio-sync');
+        
         return res.status(200).json({ status: 200, success: true, message: "Logout Successful" });
 
     } catch (error) {

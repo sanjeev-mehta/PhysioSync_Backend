@@ -14,8 +14,6 @@ export default (router: Router) => {
     router.post('/new_Notification_time', addNotificationReminder);
     router.get('/get_notification_time/:patientId', getNotificationReminders);
     router.put('/update_notification_time/:patientId', updateNotificationReminder);
-
-
 };
 
 

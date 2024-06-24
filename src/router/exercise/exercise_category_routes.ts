@@ -3,8 +3,6 @@ import { createExerciseCategory, getAllExerciseCategories } from '../../controll
 import { isAuthenticated } from '../../middlewares/index';
 
 export default (router: Router) => {
-
-router.post('/exercise-categories', createExerciseCategory);
-router.get('/getAllcategories', isAuthenticated, getAllExerciseCategories); // New route to get all categories
-
+    router.post('/exercise-categories', createExerciseCategory);
+    router.get('/getAllcategories', isAuthenticated, getAllExerciseCategories); // New route to get all categories
 }

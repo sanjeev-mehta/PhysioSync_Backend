@@ -24,9 +24,13 @@ export const createExercise = async (req: Request, res: Response): Promise<void>
         video_title,
         description,
       });
+
       const savedExercise = await newExercise.save();
+      
       console.log("New exercise added successfully !")
+      
       res.status(201).json({ message: 'Exercise has been added', success: true, data: savedExercise });
+    
     } catch (error) {
       console.error('Error creating exercise:', error);
       res.status(500).json({ message: 'Internal Server Error', success: false});
@@ -37,6 +41,7 @@ export const getAllExercise = async (req: Request, res: Response): Promise<void>
   try {
     const {sessionToken} = req.params;
     const {name} = req.query;
+    
     const therapist = await Therapist.findOne({ sessionToken: sessionToken });
 
     if (!therapist) {
@@ -50,7 +55,9 @@ export const getAllExercise = async (req: Request, res: Response): Promise<void>
     }
 
      const exercises = await addExerciseModel.find({category_name: name}, {therapist_Id: therapist._id} );
+     
      res.status(200).json({success: true, data: exercises});
+
   } catch (error) {
     console.error('Error retrieving exercise categories:', error);
     res.status(500).json({ message: 'Internal Server Error' , success: false});
@@ -61,13 +68,16 @@ export const updateExercise = async (req: Request, res: Response): Promise<void>
   try {
     const { exerciseId } = req.params;
     const updateData = req.body;
-    // Update the exercise in the database
+   
     const updatedExercise = await addExerciseModel.findByIdAndUpdate(exerciseId, updateData, { new: true });
+   
     if (!updatedExercise) {
       res.status(404).json({ message: 'Exercise not found', success: false });
       return;
     }
+   
     res.status(200).json({message: 'Exercise has been Updated', success: true});
+  
   } catch (error) {
     console.error('Error updating exercise:', error);
     res.status(500).json({ message: 'Internal Server Error', success: false });
@@ -78,19 +88,34 @@ export const delete_exercise = async (req: Request, res:Response): Promise<void>
   try{
     const { exerciseId } = req.params;
     const deleted_exercise = await addExerciseModel.findByIdAndDelete(exerciseId);
-  if (!deleted_exercise) {
+  
+    if (!deleted_exercise) {
     res.status(404).json({ message: 'Exercise Not Found', success: false });
     return;
   }
+
   res.status(200).json({message: 'Exercise has been deleted', success: true});
+  
   console.log('Exercise deleted successfully:', deleted_exercise);
+
 } catch (error) {
   console.error('Error deleting exercise:', error);
   res.status(500).json({ message: 'Internal Server Error', success: false });
 }}
 
 export const addAssignmentExercise = async (req: Request, res: Response) => {
+
   try {
+    
+    const {sessionToken} = req.params;
+    
+    const therapist = await Therapist.findOne({ sessionToken: sessionToken });
+
+    if (!therapist) {
+      res.status(404).json({ success: false, message: 'Therapist not found please login again ' });
+      return
+    }
+    
     const {
       exercise_ids,
       patient_id,
@@ -100,7 +125,6 @@ export const addAssignmentExercise = async (req: Request, res: Response) => {
       is_awaiting_reviews,
       patient_video_url,
       patient_exercise_completion_date_time,
-      therapist_id
       } = req.body;
 
     console.log('Received data for creating assignment:', req.body);
@@ -114,7 +138,7 @@ export const addAssignmentExercise = async (req: Request, res: Response) => {
       is_awaiting_reviews,
       patient_video_url,
       patient_exercise_completion_date_time,
-      therapist_id
+      therapist_id: therapist._id as string,
     });
 
     if (result && result.success) {
@@ -122,7 +146,8 @@ export const addAssignmentExercise = async (req: Request, res: Response) => {
     } else {
       res.status(400).json({ status: 400, success: false, error: result.message })
     }
-    } catch (error: any) {
+    
+  } catch (error: any) {
       console.error('Error in addAssignment controller:', error.message);
       res.status(500).json({ status: 500, success: false, error: 'Internal Server Error' });
     }
@@ -142,6 +167,7 @@ export const addAssignmentExercise = async (req: Request, res: Response) => {
       } else {
         res.status(404).json({ status: 404, success: false, error: result.message });
       }
+   
     } catch (error: any) {
       console.error('Error in editAssignment controller:', error.message);
       res.status(500).json({ status: 500, success: false, error: 'Internal Server Error' });

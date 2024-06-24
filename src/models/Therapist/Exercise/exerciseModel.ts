@@ -11,7 +11,7 @@ interface AssignExerciseData {
   is_awaiting_reviews?: boolean;
   patient_video_url?: string;
   patient_exercise_completion_date_time?: Date;
-  therapist_id?: String;
+  therapist_id?: string;
 }
 
 interface EditAssignExerciseData {
@@ -22,13 +22,15 @@ interface EditAssignExerciseData {
   is_awaiting_reviews?: boolean;
   patient_video_url?: string;
   patient_exercise_completion_date_time?: Date;
-  therapist_id?: String;
+  therapist_id?: string;
 }
 
 export async function addassignExercise(data: AssignExerciseData) {
   console.log("Received Data:", data);
 
+
   try {
+
     const {
       exercise_ids,
       patient_id,
@@ -38,7 +40,6 @@ export async function addassignExercise(data: AssignExerciseData) {
       is_awaiting_reviews = false,
       patient_video_url,
       patient_exercise_completion_date_time,
-      therapist_id
     } = data;
 
     const newAssignment = new Assignment({
@@ -50,7 +51,6 @@ export async function addassignExercise(data: AssignExerciseData) {
       is_awaiting_reviews,
       patient_video_url,
       patient_exercise_completion_date_time,
-      therapist_id
     });
 
     await newAssignment.save();

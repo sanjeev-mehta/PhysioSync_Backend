@@ -111,19 +111,17 @@ export const getAllPatients = async (req: Request, res: Response) => {
     const patients = await Patient.find({ therapist_Id: therapist._id, is_active: true }).sort({ created_at: 'desc' });
 
   return res.status(200).json({ success: true, message: "Patients found successfully", data: patients });
-  } catch (error) {
+  
+} catch (error) {
     return res.status(500).json({ message: 'Internal server error' });
   }
 };
-
-
 
 export const updatePatient = async (req: Request, res: Response) => {
   try {
     const patientId: string = req.params.patientId;
     const updatedData = req.body; // Data to be updated
 
-    // Find the patient by ID and update their information
     const updatedPatient = await Patient.findByIdAndUpdate(patientId, updatedData, { new: true });
 
     if (!updatedPatient) {
@@ -162,10 +160,11 @@ export const getPatient = async (req: Request, res: Response) => {
   try {
     const { patient_id } = req.params;
     console.log(patient_id);
-    // Query the database to find patients associated with the therapist
+    
     const patient = await Patient.find({ _id: patient_id});
 
     res.status(200).json({success: true, message: "Patient fetched successfully", data: patient});
+    
   } catch (error) {
     res.status(500).json({success: false, message: 'Internal server error' });
   }

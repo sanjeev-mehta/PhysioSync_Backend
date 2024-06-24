@@ -28,6 +28,7 @@ export const createExercise = async (req: Request, res: Response): Promise<void>
       const savedExercise = await newExercise.save();
 
       res.status(201).json({ message: 'Exercise has been added', success: true, data: savedExercise });
+    
     } catch (error) {
       console.error('Error creating exercise:', error);
       res.status(500).json({ message: 'Internal Server Error', success: false});
@@ -52,6 +53,7 @@ export const getAllExercise = async (req: Request, res: Response): Promise<void>
     }
     
     const exercises = await addExerciseModel.find({category_name: name}, {therapist_Id: therapist._id} );
+    
     res.status(200).json({success: true,message: "All exercise fetched successfuly",  data: exercises});
  
   } catch (error) {
@@ -64,13 +66,16 @@ export const updateExercise = async (req: Request, res: Response): Promise<void>
   try {
     const { exerciseId } = req.params;
     const updateData = req.body;
-    // Update the exercise in the database
+    
     const updatedExercise = await addExerciseModel.findByIdAndUpdate(exerciseId, updateData, { new: true });
+    
     if (!updatedExercise) {
       res.status(404).json({ message: 'Exercise not found', success: false });
       return;
     }
+
     res.status(200).json({message: 'Exercise has been Updated', success: true});
+  
   } catch (error) {
     console.error('Error updating exercise:', error);
     res.status(500).json({ message: 'Internal Server Error', success: false });
@@ -78,15 +83,18 @@ export const updateExercise = async (req: Request, res: Response): Promise<void>
 };
 
 export const delete_exercise = async (req: Request, res:Response): Promise<void>=>{
+  
   try{
     const { exerciseId } = req.params;
     const deleted_exercise = await addExerciseModel.findByIdAndDelete(exerciseId);
-  if (!deleted_exercise) {
+  
+    if (!deleted_exercise) {
     res.status(404).json({ message: 'Exercise Not Found', success: false });
     return;
   }
+
   res.status(200).json({message: 'Exercise has been deleted', success: true});
-  console.log('Exercise deleted successfully:', deleted_exercise);
+  
 } catch (error) {
   console.error('Error deleting exercise:', error);
   res.status(500).json({ message: 'Internal Server Error', success: false });
