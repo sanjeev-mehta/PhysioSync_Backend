@@ -3,12 +3,21 @@ import addExerciseModel from '../../../models/exercise/exercises_model';
 import { addassignExercise, editAssignExercise, getAssignedExercise, getNotification } from '../../../models/Therapist/Exercise/exerciseModel';
 import Patient from '../../../models/Patient/patientModel';
 import messages from 'router/messages/messages';
+import Therapist from '../../../models/Therapist/therapistSignupSchema';
 
 export const createExercise = async (req: Request, res: Response): Promise<void> => {
     try {
-      const { therapist_id, category_id, category_name, video_Url, video_title, description } = req.body;
+      const {sessionToken} = req.params;
+
+      const therapist = await Therapist.findOne({ sessionToken: sessionToken });
+
+      if (!therapist) {
+         res.status(404).json({ success: false, message: 'Therapist not found please login again ' });
+         return
+      }
+      const { category_id, category_name, video_Url, video_title, description } = req.body;
       const newExercise = new addExerciseModel({
-        therapist_id,
+        therapist_Id: therapist._id,
         category_id,
         category_name,
         video_Url,
@@ -26,13 +35,21 @@ export const createExercise = async (req: Request, res: Response): Promise<void>
 
 export const getAllExercise = async (req: Request, res: Response): Promise<void> => {
   try {
+    const {sessionToken} = req.params;
     const {name} = req.query;
+    const therapist = await Therapist.findOne({ sessionToken: sessionToken });
+
+    if (!therapist) {
+         res.status(404).json({ success: false, message: 'Therapist not found please login again ' });
+         return
+    }
+    
     if (!name) {
       res.status(400).json({ message: 'Name query parameter is required' });
       return;
     }
-    console.log(name)
-     const exercises = await addExerciseModel.find({category_name: name});
+
+     const exercises = await addExerciseModel.find({category_name: name}, {therapist_Id: therapist._id} );
      res.status(200).json({success: true, data: exercises});
   } catch (error) {
     console.error('Error retrieving exercise categories:', error);

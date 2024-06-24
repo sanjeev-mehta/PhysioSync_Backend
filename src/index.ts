@@ -7,8 +7,7 @@ import cors from 'cors';
 import { Server, Socket } from 'socket.io';
 import router from './router/index';
 import connectDB from './config/dbconfig';
-import MessageModel from './models/messages/messages';
-
+import { MessageModel } from './models/messages/messages';
 
 const app = express();
 const server = http.createServer(app);

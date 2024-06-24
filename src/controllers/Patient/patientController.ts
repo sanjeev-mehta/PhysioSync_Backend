@@ -226,6 +226,12 @@ export const getPatient = async (req: Request, res: Response) => {
 
         const user = await Patient.findOne( { patient_email: email} ).select('+salt +password');
 
+
+        const Token = {
+          Access_Key: process.env.Access_Key,
+          Secret_access_key: process.env.Secret_access_key
+      }
+
         if (!user) {
             return res.status(409).json({status: 409, success: false, message: 'User not found.' });
         }
@@ -236,7 +242,7 @@ export const getPatient = async (req: Request, res: Response) => {
             return res.status(403).json({status: 403, success: false, message: "Password is not correct"});
         }
 
-        return res.status(200).json({status: 200, success: true, message: 'Login successful', user }).end();
+        return res.status(200).json({status: 200, success: true, message: 'Login successful', data:user, token: Token }).end();
 
     } catch (error) {
         console.log('Error during login:', error);

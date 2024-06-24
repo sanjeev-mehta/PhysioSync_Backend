@@ -33,6 +33,11 @@ export const login = async (req: Request, res: Response) => {
 
         const user = await Therapist.findOne({ firebase_uid: uid }).select('+authentication.salt +authentication.password');
 
+        const Token = {
+            Access_Key: process.env.Access_Key,
+            Secret_access_key: process.env.Secret_access_key
+        }
+
         if (!user) {
             return res.status(409).json({ message: 'User not found.' });
         }
@@ -50,7 +55,7 @@ export const login = async (req: Request, res: Response) => {
 
         res.cookie('physio-sync', user.authentication.sessionToken, { domain: 'localhost', path: '/', httpOnly: true });
 
-        return res.status(200).json({ message: 'Login successful', data: user }).end();
+        return res.status(200).json({ message: 'Login successful', data: user, token: Token }).end();
 
     } catch (error) {
         console.log('Error during login:', error);
