@@ -5,23 +5,23 @@ import Patient from '../../../models/Patient/patientModel';
 interface AssignExerciseData {
   exercise_ids: mongoose.Types.ObjectId[];
   patient_id: mongoose.Types.ObjectId;
-  start_date: Date;
-  end_date: Date;
+  start_date: string;
+  end_date: string;
   status?: 'assigned' | 'completed';
   is_awaiting_reviews?: boolean;
   patient_video_url?: string;
-  patient_exercise_completion_date_time?: Date;
+  patient_exercise_completion_date_time?: string;
   therapist_id?: string;
 }
 
 interface EditAssignExerciseData {
   exercise_ids?: mongoose.Types.ObjectId[];
-  start_date?: Date;
-  end_date?: Date;
+  start_date?: string;
+  end_date?: string;
   status?: 'assigned' | 'completed';
   is_awaiting_reviews?: boolean;
   patient_video_url?: string;
-  patient_exercise_completion_date_time?: Date;
+  patient_exercise_completion_date_time?: string;
   therapist_id?: string;
 }
 

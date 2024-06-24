@@ -4,12 +4,12 @@ interface IAssignment extends Document {
   exercise_ids: mongoose.Types.ObjectId[];
   patient_id: mongoose.Types.ObjectId;
   assigned_at: Date;
-  start_date: Date;
-  end_date: Date;
+  start_date: String;
+  end_date: String;
   status?: 'assigned' | 'completed' | 'reviewed';
   is_awaiting_reviews?: boolean;
   patient_video_url?: string;
-  patient_exercise_completion_date_time?: Date;
+  patient_exercise_completion_date_time?: String;
   therapist_id: String;
 }
 
@@ -29,11 +29,11 @@ const assignmentSchema: Schema<IAssignment> = new Schema({
     default: Date.now
   },
   start_date: {
-    type: Date,
+    type: String,
     required: true
   },
   end_date: {
-    type: Date,
+    type: String,
     required: true
   },
   status: {
@@ -50,7 +50,7 @@ const assignmentSchema: Schema<IAssignment> = new Schema({
     required: false
   },
   patient_exercise_completion_date_time: {
-    type: Date,
+    type: String,
     required: false
   },
   therapist_id: {
