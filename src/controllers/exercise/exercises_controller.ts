@@ -52,8 +52,9 @@ export const getAllExercise = async (req: Request, res: Response): Promise<void>
       return;
     }
     
-    const exercises = await addExerciseModel.find({category_name: name}, {therapist_Id: therapist._id} );
-    
+    const exercises = await addExerciseModel.find({
+      category_name: name as string });
+      
     res.status(200).json({success: true,message: "All exercise fetched successfuly",  data: exercises});
  
   } catch (error) {
