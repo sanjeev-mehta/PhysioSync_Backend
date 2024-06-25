@@ -38,7 +38,7 @@ const assignmentSchema: Schema<IAssignment> = new Schema({
   },
   status: {
     type: String,
-    enum: ['assigned', 'completed'],
+    enum: ['assigned', 'completed', 'reviewed'],
     default: 'assigned'
   },
   is_awaiting_reviews: {

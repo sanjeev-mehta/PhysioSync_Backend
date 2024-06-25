@@ -120,7 +120,7 @@ export async function getAssignedExercise(id: string) {
 
 export async function getNotification(id: string) {
   try {
-    const assignment = await Assignment.find({therapist_id: id, is_awaiting_reviews: false})
+    const assignment = await Assignment.find({therapist_id: id, status:"completed", is_awaiting_reviews: false})
 
     if (!assignment) {
       console.error("Assignment not found");
