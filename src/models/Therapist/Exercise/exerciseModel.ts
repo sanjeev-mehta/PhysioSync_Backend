@@ -40,6 +40,7 @@ export async function addassignExercise(data: AssignExerciseData) {
       is_awaiting_reviews = false,
       patient_video_url,
       patient_exercise_completion_date_time,
+      therapist_id
     } = data;
 
     const newAssignment = new Assignment({
@@ -51,6 +52,7 @@ export async function addassignExercise(data: AssignExerciseData) {
       is_awaiting_reviews,
       patient_video_url,
       patient_exercise_completion_date_time,
+      therapist_id
     });
 
     await newAssignment.save();
