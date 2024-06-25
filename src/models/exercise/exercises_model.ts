@@ -7,6 +7,7 @@ export interface AddExercise extends Document {
     video_Url: string;
     video_title: string;
     description: string;
+    video_thumbnail: string;
 }
 
 const addExerciseSchema = new Schema({
@@ -16,6 +17,7 @@ const addExerciseSchema = new Schema({
     video_Url: { type: String, required: true },
     video_title: { type: String, required: true },
     description: { type: String, required: true },
+    video_thumbnail: {type: String, required: true}
 });
 
 const addExerciseModel = mongoose.model<AddExercise>('exercises', addExerciseSchema);

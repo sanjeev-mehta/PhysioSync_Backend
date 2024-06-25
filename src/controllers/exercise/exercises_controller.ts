@@ -15,7 +15,7 @@ export const createExercise = async (req: Request, res: Response): Promise<void>
          return
       }
 
-      const { category_id, category_name, video_Url, video_title, description } = req.body;
+      const { category_id, category_name, video_Url, video_title, description, video_thumbnail } = req.body;
       const newExercise = new addExerciseModel({
         therapist_Id: therapist._id,
         category_id,
@@ -23,6 +23,7 @@ export const createExercise = async (req: Request, res: Response): Promise<void>
         video_Url,
         video_title,
         description,
+        video_thumbnail
       });
 
       const savedExercise = await newExercise.save();
@@ -54,7 +55,7 @@ export const getAllExercise = async (req: Request, res: Response): Promise<void>
     
     const exercises = await addExerciseModel.find({
       category_name: name as string });
-      
+
     res.status(200).json({success: true,message: "All exercise fetched successfuly",  data: exercises});
  
   } catch (error) {
