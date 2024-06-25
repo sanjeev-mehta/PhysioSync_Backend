@@ -10,6 +10,8 @@ export const createExercise = async (req: Request, res: Response): Promise<void>
 
       const therapist = await Therapist.findOne({ sessionToken: sessionToken });
 
+      console.log(therapist)
+
       if (!therapist) {
          res.status(404).json({ success: false, message: 'Therapist not found please login again ' });
          return
@@ -17,7 +19,7 @@ export const createExercise = async (req: Request, res: Response): Promise<void>
 
       const { category_id, category_name, video_Url, video_title, description, video_thumbnail } = req.body;
       const newExercise = new addExerciseModel({
-        therapist_Id: therapist._id,
+        therapist_id: therapist._id,
         category_id,
         category_name,
         video_Url,
