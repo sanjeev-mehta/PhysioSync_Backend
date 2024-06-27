@@ -48,6 +48,7 @@ io.on('connection', (socket: Socket) => {
 
   socket.on('send', async (data) => {
     const { senderId, receiverId, message, is_media } = data;
+    console.log(data);
     try {
       const newMessage = await MessageModel.create({
         sender_id: senderId,
@@ -96,27 +97,27 @@ io.on('connection', (socket: Socket) => {
   });
   
   // fetch chats
-  socket.on('fetchAllPatientsWithDetails', async (therapistId) => {
+  socket.on('fetchAllPatientsWithDetails', async (id) => {
     try {
       // Fetch all messages involving the therapist
       const messages = await MessageModel.find({
         $or: [
-          { sender_id: therapistId },
-          { receiver_id: therapistId }
+          { sender_id: id },
+          { receiver_id: id }
         ]
       }).sort({ createdAt: -1 });
-  
+
       // Extract unique patient IDs
       const patientIds = new Set();
       messages.forEach(message => {
-        if (message.sender_id !== therapistId) {
+        if (message.sender_id !== id) {
           patientIds.add(message.sender_id);
         }
-        if (message.receiver_id !== therapistId) {
+        if (message.receiver_id !== id) {
           patientIds.add(message.receiver_id);
         }
       });
-  
+
       // Convert patientIds to array
       const patientIdsArray = Array.from(patientIds);
   
@@ -125,17 +126,19 @@ io.on('connection', (socket: Socket) => {
         // Fetch the latest message
         const latestMessage = await MessageModel.findOne({
           $or: [
-            { sender_id: patientId, receiver_id: therapistId },
-            { sender_id: therapistId, receiver_id: patientId }
+            { sender_id: patientId, receiver_id: id },
+            { sender_id: id, receiver_id: patientId }
           ]
         }).sort({ createdAt: -1 });
 
         const unreadCount = await MessageModel.countDocuments({
-          sender_id: therapistId,
-          receiver_id: patientId,
+          sender_id: patientId,
+          receiver_id: id,
           is_read: false
         });
   
+        console.log(unreadCount);
+
         return {
           patientId,
           latestMessage,
@@ -159,7 +162,7 @@ io.on('connection', (socket: Socket) => {
       });
   
       socket.emit('allPatientsWithDetails', patientsWithDetails);
-      console.log(`Fetched all patients with details and unread counts for therapist ${therapistId}`);
+      console.log(`Fetched all patients with details and unread counts for therapist ${id}`);
     } catch (error) {
       console.error('Error fetching all patient details and latest messages for therapist:', error);
     }

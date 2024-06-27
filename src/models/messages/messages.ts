@@ -18,7 +18,7 @@ export interface IMessageModel extends Model<IMessage> {
 const messageSchema = new Schema<IMessage>({
   sender_id: { type: String, ref: 'User', required: true },
   receiver_id: { type: String, ref: 'User', required: true },
-  chat_id: { type: Schema.Types.ObjectId, ref: 'Chat', required: true }, 
+  // chat_id: { type: Schema.Types.ObjectId, ref: 'Chat', required: true }, 
   message_text: { type: String, required: true },
   is_read: { type: Boolean, required: true, default: false },
   is_media: { type: Boolean, required: true },
