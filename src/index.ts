@@ -8,6 +8,7 @@ import { Server, Socket } from 'socket.io';
 import router from './router/index';
 import connectDB from './config/dbconfig';
 import { MessageModel } from './models/messages/messages';
+import Patient from './models/Patient/patientModel';
 
 const app = express();
 const server = http.createServer(app);
@@ -93,7 +94,39 @@ io.on('connection', (socket: Socket) => {
       console.error('Error fetching previous messages:', error);
     }
   });
+  
+  // fetch chats
+  socket.on('fetchAllPatientsWithDetails', async (therapistId) => {
+    try {
+      const messages = await MessageModel.find({
+        $or: [
+          { sender_id: therapistId },
+          { receiver_id: therapistId }
+        ]
+      }).sort({ createdAt: -1 });
 
+      // fetch unique patient IDs
+      const patientIds = new Set();
+      messages.forEach(message => {
+        if (message.sender_id !== therapistId) {
+          patientIds.add(message.sender_id);
+        }
+        if (message.receiver_id !== therapistId) {
+          patientIds.add(message.receiver_id);
+        }
+      });
+
+      // Fetch patient 
+      const patients = await Patient.find({
+        _id: { $in: Array.from(patientIds) }
+      });
+
+      socket.emit('allPatientsWithDetails', patients);
+      console.log(`Fetched all patient details for therapist ${therapistId}`);
+    } catch (error) {
+      console.error('Error fetching all patient details for therapist:', error);
+    }
+  });
   
 
   socket.on('disconnect', () => {
