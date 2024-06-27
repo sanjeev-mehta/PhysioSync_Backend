@@ -1,3 +1,4 @@
+require('dotenv').config();
 import { Request, Response } from 'express';
 import admin from '../../config/firebaseAdmin'; 
 import Therapist from '../../models/Therapist/therapistSignupSchema';
