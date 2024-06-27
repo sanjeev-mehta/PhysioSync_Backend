@@ -1,7 +1,7 @@
 import mongoose, { Document, Schema } from 'mongoose';
 
 export interface IPatient extends Document {
-  therapist_Id: string;
+  therapist_Id: mongoose.Types.ObjectId;
   first_name: string;
   last_name: string;
   patient_email: string;
@@ -21,7 +21,7 @@ export interface IPatient extends Document {
 }
 
 const PatientSchema: Schema = new Schema({
-  therapist_Id: { type: String, required: true },
+  therapist_Id: { type: Schema.Types.ObjectId,ref:"Therapist", required: true },
   first_name: { type: String, required: true },
   last_name: { type: String, required: true },
   phone_no: { type: String, required: true},

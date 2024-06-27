@@ -223,7 +223,7 @@ export const getPatient = async (req: Request, res: Response) => {
             return res.status(400).json({status: 400, success: false, message: 'Email and password are required.' });
         }
 
-        const user = await Patient.findOne( { patient_email: email} ).select('+salt +password');
+        const user = (await Patient.findOne( { patient_email: email} ).populate('therapist_Id').select('+salt +password'));
 
 
         const Token = {
