@@ -8,7 +8,7 @@ export default (router: Router) => {
     router.put('/update_patients/:patientId', isAuthenticated, updatePatient); 
     router.get('/patient_email/:email', verifyEmail);
     router.put('/disable_patient/:patientId', isAuthenticated, disablePatient);
-    router.get('/get_patient/:patient_id', isAuthenticated, getPatient);
+    router.get('/get_patient/:patient_id', getPatient);
     router.post('/set_password', setPassword);
     router.post('/patient_login', patientLogin);
     router.post('/new_Notification_time', addNotificationReminder);
