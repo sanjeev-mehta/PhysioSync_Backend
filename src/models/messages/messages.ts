@@ -28,6 +28,7 @@ const messageSchema = new Schema<IMessage>({
   timestamps: true
 });
 
+
 messageSchema.statics.getUnreadMessageCount = async function(receiverId: string): Promise<number> {
   try {
     const count = await this.countDocuments({ receiver_id: receiverId, is_read: false });

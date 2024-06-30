@@ -98,27 +98,27 @@ export async function editAssignExercise(id: string, newData: EditAssignExercise
   }
 }
 
-export async function getAssignedExercise(id: string) {
-  console.log("Received Assignment ID for getting Assignment:", id);
+// export async function getAssignedExercise(id: string) {
+//   console.log("Received Assignment ID for getting Assignment:", id);
 
-  try {
-    const patient = await Patient.findById(id);
-    const assignment = await Assignment.find({patient_id: id, is_awaiting_reviews: false})
-    .populate('exercise_ids')
+//   try {
+//     const patient = await Patient.findById(id);
+//     const assignment = await Assignment.find({patient_id: id, is_awaiting_reviews: false})
+//     .populate('exercise_ids')
 
-    console.log(patient);
-    if (patient === null) {
-      console.error("Assignment not found");
-      return { success: false, message: 'Patient not found' };
-    }
+//     console.log(patient);
+//     if (patient === null) {
+//       console.error("Assignment not found");
+//       return { success: false, message: 'Patient not found' };
+//     }
 
-    return {exercise: assignment, patient: patient};
+//     return {exercise: assignment, patient: patient};
 
-  } catch (error: any) {
-    console.error("Error getting assignment:", error.message);
-    return { success: false, message: 'Failed to get assignment' };
-  }
-}
+//   } catch (error: any) {
+//     console.error("Error getting assignment:", error.message);
+//     return { success: false, message: 'Failed to get assignment' };
+//   }
+// }
 
 export async function getNotification(id: string) {
   try {

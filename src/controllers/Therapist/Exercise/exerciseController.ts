@@ -1,9 +1,12 @@
 import { Request, Response } from 'express';
 import addExerciseModel from '../../../models/exercise/exercises_model';
-import { addassignExercise, editAssignExercise, getAssignedExercise, getNotification } from '../../../models/Therapist/Exercise/exerciseModel';
+import { addassignExercise, editAssignExercise,  getNotification } from '../../../models/Therapist/Exercise/exerciseModel';
 import Patient from '../../../models/Patient/patientModel';
+import PatientWatchData from '../../../models/Patient/watchData'
 import messages from 'router/messages/messages';
 import Therapist from '../../../models/Therapist/therapistSignupSchema';
+import Assignment, { IAssignment } from '../../../models/Therapist/Exercise/exerciseSchema'; 
+
 
 export const createExercise = async (req: Request, res: Response): Promise<void> => {
     try {
@@ -174,23 +177,49 @@ export const addAssignmentExercise = async (req: Request, res: Response) => {
     }
   };
 
-  export const getAssignmentExercise = async (req: Request, res: Response) => {
-    try {
-      const { patient_id } = req.params;
+//   export const getAssignmentExercise = async (req: Request, res: Response) => {
+//     try {
+//       const { patient_id } = req.params;
   
-      console.log('Received ID for getting assignment:', patient_id);
+//       console.log('Received ID for getting assignment:', patient_id);
 
-      const data = await getAssignedExercise(patient_id)
+//       const data = await getAssignedExercise(patient_id)
 
-      res.status(200).json({ 
-      success: true, 
-      message: 'Assignment found successfully',
-      data: data 
-    });
+//       res.status(200).json({ 
+//       success: true, 
+//       message: 'Assignment found successfully',
+//       data: data 
+//     });
 
-  } catch (error: any) {
-    console.error('Error in getAssignment controller:', error.message);
-    res.status(500).json({ status: 500, success: false, error: 'Internal Server Error' });
+//   } catch (error: any) {
+//     console.error('Error in getAssignment controller:', error.message);
+//     res.status(500).json({ status: 500, success: false, error: 'Internal Server Error' });
+//   }
+// };
+export const getAssignmentExercise = async (req: Request, res: Response) => {
+  try {
+      const { patient_id } = req.params;
+
+      const patient = await Patient.findById(patient_id);
+      if (!patient) {
+          return res.status(404).json({ error: 'Patient not found' });
+      }
+      
+      const watchDataArray = await PatientWatchData.find({ patient_id })
+      const assignments = await Assignment.find({ patient_id, is_awaiting_reviews: false }).populate('exercise_ids');
+      const watchData = watchDataArray[0];
+      const patientData = {
+          
+          
+        patient: patient,
+          data: assignments || [],
+          watchData: watchData, 
+      };
+
+      res.status(200).json(patientData);
+  } catch (error) {
+      console.error('Error fetching patient data:', error);
+      res.status(500).json({ error: 'An error occurred while fetching patient data' });
   }
 };
 
