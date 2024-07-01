@@ -3,12 +3,13 @@ import { ChatModel, MessageModel } from '../../models/messages/messages';
 
 export const createMessage = async (req: Request, res: Response): Promise<void> => {
   try {
-    const { sender_id, receiver_id, message_text } = req.body;
+    const { sender_id, receiver_id, message_text, } = req.body;
     
     const newMessage = new MessageModel({
       sender_id,
       receiver_id,
       message_text
+
     });
 
     const savedMessage = await newMessage.save();

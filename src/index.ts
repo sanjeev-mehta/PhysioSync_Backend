@@ -47,7 +47,7 @@ io.on('connection', (socket: Socket) => {
   });
 
   socket.on('send', async (data) => {
-    const { senderId, receiverId, message, is_media } = data;
+    const { senderId, receiverId, message, is_media, media_link,is_video } = data;
     console.log(data);
     try {
       const newMessage = await MessageModel.create({
@@ -55,7 +55,10 @@ io.on('connection', (socket: Socket) => {
         receiver_id: receiverId,
         message_text: message,
         is_read: false,
-        is_media: is_media
+        is_media: is_media,
+        media_link: media_link,
+        is_video:is_video
+        
       });
       console.log('Message saved to database:', newMessage);
     } catch (error) {

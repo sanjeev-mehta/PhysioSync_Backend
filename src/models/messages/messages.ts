@@ -7,8 +7,8 @@ export interface IMessage extends Document {
   message_text: string;
   is_read: boolean;
   is_media: boolean;
-  image_url?: string;
-  video_url?: string;
+  media_link: string;
+  is_video?: boolean;
 }
 
 export interface IMessageModel extends Model<IMessage> {
@@ -19,11 +19,11 @@ const messageSchema = new Schema<IMessage>({
   sender_id: { type: String, ref: 'User', required: true },
   receiver_id: { type: String, ref: 'User', required: true },
   // chat_id: { type: Schema.Types.ObjectId, ref: 'Chat', required: true }, 
-  message_text: { type: String, required: true },
+  message_text: { type: String, required: false },
   is_read: { type: Boolean, required: true, default: false },
   is_media: { type: Boolean, required: true },
-  image_url: { type: String, required: false },
-  video_url: { type: String, required: false },
+  media_link: { type: String, required: false, default: "" },
+  is_video: { type: Boolean, required: false, default: false},
 }, {
   timestamps: true
 });
