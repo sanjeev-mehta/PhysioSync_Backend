@@ -1,5 +1,5 @@
 import { Router } from 'express';
-import { createWatchData, getWatchData, updateWatchData } from '../../controllers/Patient/WatchDataController';
+import { createWatchData, getWatchData, updateWatchData } from '../../controllers/Patient/watchDataController';
 
 export default (router: Router) => {
     router.post('/watchdata', createWatchData);
