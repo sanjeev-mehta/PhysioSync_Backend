@@ -210,7 +210,7 @@ export const getAssignmentExercise = async (req: Request, res: Response) => {
       const watchData = watchDataArray[0];
       const patientData = {
           patient: patient,
-          data: assignments || [],
+          exercise: assignments || [],
           watchData: watchData, 
       };
 
