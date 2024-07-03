@@ -209,14 +209,12 @@ export const getAssignmentExercise = async (req: Request, res: Response) => {
       const assignments = await Assignment.find({ patient_id, is_awaiting_reviews: false }).populate('exercise_ids');
       const watchData = watchDataArray[0];
       const patientData = {
-          
-          
-        patient: patient,
+          patient: patient,
           data: assignments || [],
           watchData: watchData, 
       };
 
-      res.status(200).json(patientData);
+      res.status(200).json({success: true, message: 'Assignment found successfully', data: patientData});
   } catch (error) {
       console.error('Error fetching patient data:', error);
       res.status(500).json({ error: 'An error occurred while fetching patient data' });
