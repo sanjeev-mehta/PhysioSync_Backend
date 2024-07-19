@@ -1,5 +1,5 @@
 import { Express, Request, Response } from "express";
-import {createTherapist, editTherapist, getSingleTherapist, updatePassword, updatepatientPassword} from "../../models/Therapist/therapistModel";
+import {createTherapist, editTherapist, getSingleTherapist, updatePassword, updatepatientPassword, deleteTherapist} from "../../models/Therapist/therapistModel";
 
 export const addTherapist = async (req: Request, res: Response) => {
   try {
@@ -112,6 +112,25 @@ export const updatePatientPassword = async (req: Request, res: Response) => {
     }
   } catch (error: any) {
     console.error('Error in editTherapist controller:', error.message);
+    res.status(500).json({ status: 500, success: false, error: 'Internal Server Error' });
+  }
+};
+
+export const removeTherapist = async (req: Request, res: Response) => {
+  try {
+    const { therapistId } = req.params;
+
+    console.log('Received data for deleting therapist:', therapistId);
+
+    const result = await deleteTherapist(therapistId);
+
+    if (result && result.success) {
+      res.status(200).json({ status: 200, success: true, message: result.message });
+    } else {
+      res.status(404).json({ status: 404, success: false, error: result.message });
+    }
+  } catch (error: any) {
+    console.error('Error in removeTherapist controller:', error.message);
     res.status(500).json({ status: 500, success: false, error: 'Internal Server Error' });
   }
 };

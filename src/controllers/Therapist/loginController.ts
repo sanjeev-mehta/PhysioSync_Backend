@@ -32,7 +32,8 @@ export const login = async (req: Request, res: Response) => {
         //     return res.status(403).json({ message: 'Email is not verified.' });
         // }
 
-        const user = await Therapist.findOne({ firebase_uid: uid }).select('+authentication.salt +authentication.password');
+        const user = await Therapist.findOne({ firebase_uid: uid }).select('+authentication.salt +authentication.password +is_active');
+
 
         const Token = {
             Access_Key: process.env.Access_Key,
@@ -41,6 +42,9 @@ export const login = async (req: Request, res: Response) => {
 
         if (!user) {
             return res.status(409).json({ message: 'User not found.' });
+        }
+        if (!user.is_active) {
+            return res.status(404).json({ message: 'User not found with these credentials in our database. Please create an account.' });
         }
 
         const expectedHash = authentication(user.authentication.salt, password);

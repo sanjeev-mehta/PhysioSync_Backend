@@ -59,6 +59,7 @@ export async function createTherapist (data: Partial<TherapistData>)  {
         salt,
         password: hashedPassword,
       },
+      is_active: true,
     });
 
     await newTherapist.save(); 
@@ -203,4 +204,28 @@ export async function updatepatientPassword(patient_id: string, oldPassword: str
   
   return { success: false, message: error.message };
  }
+}
+
+export async function deleteTherapist(therapistId: string) {
+  console.log("Received therapist ID for deleting Therapist:", therapistId);
+
+  try {
+    const therapist = await Therapist.findById(therapistId);
+
+    if (!therapist) {
+      console.error("Therapist not found");
+      return { success: false, message: 'Therapist not found' };
+    }
+
+    therapist.is_active = false;
+    await therapist.save();
+
+    console.log("Therapist deleted successfully.");
+
+    return { success: true, message: 'Therapist deleted successfully' };
+
+  } catch (error: any) {
+    console.error("Error deleting therapist:", error.message);
+    return { success: false, message: 'Failed to delete therapist' };
+  }
 }

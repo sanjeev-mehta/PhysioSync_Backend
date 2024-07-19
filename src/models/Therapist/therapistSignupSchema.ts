@@ -20,6 +20,7 @@ interface ITherapist extends Document {
   firebase_uid: string;
   authentication: Authentication;
   is_authenticated: boolean;
+  is_active: boolean; 
 }
 
 const clinicSchema = new Schema<Clinic>({
@@ -42,6 +43,7 @@ const therapistSignupSchema: Schema<ITherapist> = new Schema({
   firebase_uid: { type: String, required: true },
   authentication: { type: authenticationSchema, required: true },
   is_authenticated: { type: Boolean, default: false },
+  is_active: { type: Boolean, default: true }
 });
 
 const Therapist = mongoose.model<ITherapist>('Therapist', therapistSignupSchema);
