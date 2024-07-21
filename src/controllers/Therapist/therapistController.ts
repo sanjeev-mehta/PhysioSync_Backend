@@ -82,6 +82,10 @@ export const updateTherapistPassword = async (req: Request, res: Response) => {
 
     console.log('Received data for editing therapist:', { oldPassword, newPassword });
 
+    if(!sessionToken){
+      return res.status(400).json("Please login");
+    }
+
     const result = await updatePassword(sessionToken,  oldPassword, newPassword);
 
     if (result && result.success) {

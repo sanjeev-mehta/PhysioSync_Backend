@@ -5,7 +5,8 @@ import Patient from '../../../models/Patient/patientModel';
 import PatientWatchData from '../../../models/Patient/watchData'
 import messages from 'router/messages/messages';
 import Therapist from '../../../models/Therapist/therapistSignupSchema';
-import Assignment, { IAssignment } from '../../../models/Therapist/Exercise/exerciseSchema'; 
+import Assignment, { IAssignment } from '../../../models/Therapist/Exercise/exerciseSchema';
+import mongoose from 'mongoose'; 
 
 
 export const createExercise = async (req: Request, res: Response): Promise<void> => {
@@ -106,76 +107,77 @@ export const delete_exercise = async (req: Request, res:Response): Promise<void>
   res.status(500).json({ message: 'Internal Server Error', success: false });
 }}
 
-export const addAssignmentExercise = async (req: Request, res: Response) => {
-
+export const addAssignmentExercise = async (req: Request, res: Response): Promise<void> => {
   try {
-    
-    const {sessionToken} = req.params;
-    
-    const therapist = await Therapist.findOne({ sessionToken: sessionToken });
+      const { sessionToken } = req.params;
+      const therapist = await Therapist.findOne({ sessionToken: sessionToken });
 
-    if (!therapist) {
-      res.status(404).json({ success: false, message: 'Therapist not found please login again ' });
-      return
-    }
-    
-    const {
-      exercise_ids,
-      patient_id,
-      start_date,
-      end_date,
-      status,
-      is_awaiting_reviews,
-      patient_video_url,
-      patient_exercise_completion_date_time,
+      if (!therapist) {
+          res.status(404).json({ success: false, message: 'Therapist not found please login again' });
+          return;
+      }
+
+      const {
+          exercise_ids,
+          patient_id,
+          start_date,
+          end_date,
+          patient_video_url,
+          patient_exercise_completion_date_time,
       } = req.body;
 
-    console.log('Received data for creating assignment:', req.body);
+      console.log('Received data for creating assignment:', req.body);
 
-    const result = await addassignExercise({
-      exercise_ids,
-      patient_id,
-      start_date,
-      end_date,
-      status,
-      is_awaiting_reviews,
-      patient_video_url,
-      patient_exercise_completion_date_time,
-      therapist_id: therapist._id as string,
-    });
+      const formattedExerciseIds = exercise_ids.map((id: mongoose.Types.ObjectId) => ({
+          exercise_id: id,
+          is_assigned: false,
+          is_awaiting_reviews: false,
+      }));
 
-    if (result && result.success) {
-      res.status(201).json({ status: 201, success: true, message: result.message, data: result.data });
-    } else {
-      res.status(400).json({ status: 400, success: false, error: result.message })
-    }
-    
+      const result = await addassignExercise({
+          exercise_ids: formattedExerciseIds,
+          patient_id,
+          start_date,
+          end_date,
+          patient_video_url,
+          patient_exercise_completion_date_time,
+          therapist_id: therapist._id.toString(),
+      });
+
+      if (result && result.success) {
+          res.status(201).json({ status: 201, success: true, message: result.message, data: result.data });
+      } else {
+          res.status(400).json({ status: 400, success: false, error: result.message });
+      }
+
   } catch (error: any) {
       console.error('Error in addAssignment controller:', error.message);
       res.status(500).json({ status: 500, success: false, error: 'Internal Server Error' });
-    }
-  };
+  }
+};
 
-  export const editAssignmentExercise = async (req: Request, res: Response) => {
-    try {
+// Edit an assignment exercise
+export const editAssignmentExercise = async (req: Request, res: Response): Promise<void> => {
+  try {
       const { id } = req.params;
       const newData = req.body;
-  
+
       console.log('Received data for editing assignment:', id);
-  
+
       const result = await editAssignExercise(id, newData);
-  
+
       if (result && result.success) {
-        res.status(200).json({ status: 200, success: true, message: result.message, data: result.data });
+          res.status(200).json({ status: 200, success: true, message: result.message, data: result.data });
       } else {
-        res.status(404).json({ status: 404, success: false, error: result.message });
+          res.status(404).json({ status: 404, success: false, error: result.message });
       }
-   
-    } catch (error: any) {
+
+  } catch (error: any) {
       console.error('Error in editAssignment controller:', error.message);
       res.status(500).json({ status: 500, success: false, error: 'Internal Server Error' });
-    }
-  };
+  }
+};
+
 
 //   export const getAssignmentExercise = async (req: Request, res: Response) => {
 //     try {
@@ -206,7 +208,8 @@ export const getAssignmentExercise = async (req: Request, res: Response) => {
       }
       
       const watchDataArray = await PatientWatchData.find({ patient_id })
-      const assignments = await Assignment.find({ patient_id, is_awaiting_reviews: false }).populate('exercise_ids');
+      const assignments = await Assignment.find({ patient_id, is_awaiting_reviews: false })
+      .populate('exercise_ids');
       const watchData = watchDataArray[0];
       const patientData = {
           patient: patient,

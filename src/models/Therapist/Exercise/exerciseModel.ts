@@ -3,7 +3,11 @@ import mongoose from 'mongoose';
 import Patient from '../../../models/Patient/patientModel';
 
 interface AssignExerciseData {
-  exercise_ids: mongoose.Types.ObjectId[];
+  exercise_ids: {
+    exercise_id: mongoose.Types.ObjectId;
+    is_assigned?: boolean;
+    is_awaiting_reviews?: boolean;
+  }[];
   patient_id: mongoose.Types.ObjectId;
   start_date: string;
   end_date: string;
@@ -15,7 +19,11 @@ interface AssignExerciseData {
 }
 
 interface EditAssignExerciseData {
-  exercise_ids?: mongoose.Types.ObjectId[];
+  exercise_ids?: {
+    exercise_id: mongoose.Types.ObjectId;
+    is_assigned?: boolean;
+    is_awaiting_reviews?: boolean;
+  }[];
   start_date?: string;
   end_date?: string;
   status?: 'assigned' | 'completed';
@@ -28,9 +36,7 @@ interface EditAssignExerciseData {
 export async function addassignExercise(data: AssignExerciseData) {
   console.log("Received Data:", data);
 
-
   try {
-
     const {
       exercise_ids,
       patient_id,
@@ -78,13 +84,20 @@ export async function editAssignExercise(id: string, newData: EditAssignExercise
       return { success: false, message: 'Assignment not found' };
     }
 
-    if (newData.exercise_ids) assignment.exercise_ids = newData.exercise_ids;
+    if (newData.exercise_ids) {
+      assignment.exercise_ids = newData.exercise_ids.map((exercise: any) => ({
+          exercise_id: new mongoose.Types.ObjectId(exercise.exercise_id),
+          is_assigned: exercise.is_assigned,
+          is_awaiting_reviews: exercise.is_awaiting_reviews,
+      }));
+  }
     if (newData.start_date) assignment.start_date = newData.start_date;
     if (newData.end_date) assignment.end_date = newData.end_date;
     if (newData.status) assignment.status = newData.status;
     if (newData.is_awaiting_reviews !== undefined) assignment.is_awaiting_reviews = newData.is_awaiting_reviews;
     if (newData.patient_video_url) assignment.patient_video_url = newData.patient_video_url;
     if (newData.patient_exercise_completion_date_time) assignment.patient_exercise_completion_date_time = newData.patient_exercise_completion_date_time;
+    if (newData.therapist_id) assignment.therapist_id = newData.therapist_id;
 
     await assignment.save();
 
