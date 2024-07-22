@@ -209,7 +209,7 @@ export const getAssignmentExercise = async (req: Request, res: Response) => {
       
       const watchDataArray = await PatientWatchData.find({ patient_id })
       const assignments = await Assignment.find({ patient_id, is_awaiting_reviews: false })
-      .populate('exercise_ids');
+      .populate('exercise_ids.exercise_id');
       const watchData = watchDataArray[0];
       const patientData = {
           patient: patient,
