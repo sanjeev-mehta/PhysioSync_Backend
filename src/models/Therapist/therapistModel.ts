@@ -88,12 +88,13 @@ export async function editTherapist(sessionToken: string, newData: Partial<Thera
       return { success: false, message: 'Therapist not found' };
     }
 
-    therapist.therapist_name = newData.therapist_name;
-    therapist.email = newData.email;
-    therapist.profile_photo = newData.profile_photo;
-    therapist.clinic.address = newData.clinic_address;
-    therapist.clinic.contact_no = newData.clinic_contact_no;
-    therapist.clinic.name = newData.clinic_name;
+    if (newData.therapist_name !== undefined) therapist.therapist_name = newData.therapist_name;
+    if (newData.email !== undefined) therapist.email = newData.email;
+    if (newData.profile_photo !== undefined) therapist.profile_photo = newData.profile_photo;
+    if (newData.clinic_address !== undefined) therapist.clinic.address = newData.clinic_address;
+    if (newData.clinic_contact_no !== undefined) therapist.clinic.contact_no = newData.clinic_contact_no;
+    if (newData.clinic_name !== undefined) therapist.clinic.name = newData.clinic_name;
+
    
     await therapist.save();
 
