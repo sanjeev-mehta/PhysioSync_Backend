@@ -39,7 +39,7 @@ export const addTherapist = async (req: Request, res: Response) => {
 export const editTherapistController = async (req: Request, res: Response) => {
   try {
     const authorizationHeader = req.headers.authorization;
-    const {newData} = req.body;
+    const newData = req.body;
 
       if (!authorizationHeader) {
          res.status(401).json({ status: false, message: "Authorization header not found" });
@@ -47,6 +47,7 @@ export const editTherapistController = async (req: Request, res: Response) => {
       }
 
       const [bearer, sessionToken] = authorizationHeader.split(' ');
+      console.log("This is my session",sessionToken);
 
     if (!sessionToken || bearer !== 'Bearer') {
        res.status(401).json({ status: false, message: "Session token not found or invalid format" });
