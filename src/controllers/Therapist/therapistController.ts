@@ -58,9 +58,22 @@ export const editTherapistController = async (req: Request, res: Response) => {
 
 export const getTherapistController = async (req: Request, res: Response) => {
   try {
-    const { sessionToken } = req.params;
-  
+    const authorizationHeader = req.headers.authorization;
+
+    if (!authorizationHeader) {
+      return res.status(401).json({ status: false, message: "Authorization header not found" });
+    }
+    const [bearer, sessionToken] = authorizationHeader.split(' ');
+
+    if (!sessionToken || bearer !== 'Bearer') {
+      return res.status(401).json({ status: false, message: "Session token not found or invalid format" });
+    }
+
+    console.log("Extracted session token:", sessionToken);
+
     const result = await getSingleTherapist(sessionToken);
+
+    console.log("This is the result", result);
 
     if (result && result.success) {
       res.status(200).json({ status: 200, success: true, message: result.message, data: result.data });
@@ -68,7 +81,7 @@ export const getTherapistController = async (req: Request, res: Response) => {
       res.status(404).json({ status: 404, success: false, error: result.message });
     }
   } catch (error: any) {
-    console.error('Error in editTherapist controller:', error.message);
+    console.error('Error in getTherapistController:', error.message);
     res.status(500).json({ status: 500, success: false, error: 'Internal Server Error' });
   }
 };

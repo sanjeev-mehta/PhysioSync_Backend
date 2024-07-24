@@ -36,13 +36,14 @@ export const isAuthenticated = async (req: Request, res: Response, next: () => v
 
         const sessionToken = authHeader.split(' ')[1];
 
-        console.log(sessionToken);
+        console.log("i am in auth", sessionToken);
 
         if (!sessionToken) {
             return res.status(403).json({ status: 403, message: "User is not authenticated" });
         }
 
         const existingUser = await getUserBySessionToken(sessionToken);
+        console.log("i am in auth 1 ", sessionToken, existingUser )
 
         if (!existingUser) {
             return res.status(403).json({ status: 403, message: "User is not authenticated" });

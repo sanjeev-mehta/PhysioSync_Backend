@@ -1,6 +1,6 @@
 import { Request, Response } from 'express';
 import addExerciseModel from '../../../models/exercise/exercises_model';
-import { addassignExercise, editAssignExercise,  getNotification } from '../../../models/Therapist/Exercise/exerciseModel';
+import { addassignExercise, editAssignExercise,  getNotification, updateCompleted } from '../../../models/Therapist/Exercise/exerciseModel';
 import Patient from '../../../models/Patient/patientModel';
 import PatientWatchData from '../../../models/Patient/watchData'
 import messages from 'router/messages/messages';
@@ -179,6 +179,27 @@ export const editAssignmentExercise = async (req: Request, res: Response): Promi
 };
 
 
+export const updateCompletedExercise = async (req: Request, res: Response): Promise<void> => {
+  try {
+      const { id } = req.params;
+      const newData = req.body;
+
+      console.log('Received data for editing assignment:', id);
+
+      const result = await updateCompleted(id, newData);
+
+      if (result && result.success) {
+          res.status(200).json({ status: 200, success: true, message: result.message, data: result.data });
+      } else {
+          res.status(404).json({ status: 404, success: false, error: result.message });
+      }
+
+  } catch (error: any) {
+      console.error('Error in editAssignment controller:', error.message);
+      res.status(500).json({ status: 500, success: false, error: 'Internal Server Error' });
+  }
+};
+
 //   export const getAssignmentExercise = async (req: Request, res: Response) => {
 //     try {
 //       const { patient_id } = req.params;
@@ -198,6 +219,7 @@ export const editAssignmentExercise = async (req: Request, res: Response): Promi
 //     res.status(500).json({ status: 500, success: false, error: 'Internal Server Error' });
 //   }
 // };
+
 export const getAssignmentExercise = async (req: Request, res: Response) => {
   try {
       const { patient_id } = req.params;

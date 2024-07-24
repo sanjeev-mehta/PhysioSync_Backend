@@ -6,7 +6,7 @@ export default (router: Router) => {
     router.post('/add_new_patients', isAuthenticated, addNewPatient);
     router.get('/get_all_patients', isAuthenticated, getAllPatients); 
     router.put('/update_patients/:patientId', isAuthenticated, updatePatient); 
-    router.put('/update_patient/:patientId', updatePatient); // patient updation
+    router.put('/update_patient/:patientId', updatePatient);
     router.get('/patient_email/:email', verifyEmail);
     router.put('/disable_patient/:patientId', isAuthenticated, disablePatient);
     router.get('/get_patient/:patient_id', getPatient);

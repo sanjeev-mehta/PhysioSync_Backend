@@ -113,7 +113,10 @@ export async function getSingleTherapist(sessionToken: string) {
   console.log("Received therapist ID for getting Therapist:", sessionToken);
 
   try {
-    const query = { sessionToken: sessionToken };
+
+    const finaltoken =  sessionToken;
+
+    const query = { 'authentication.sessionToken': finaltoken };
     const therapist = await Therapist.findOne(query);
 
     if (!therapist) {

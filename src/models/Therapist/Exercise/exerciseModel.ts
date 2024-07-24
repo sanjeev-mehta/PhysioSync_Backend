@@ -152,3 +152,38 @@ export async function getNotification(id: string) {
     return { success: false, message: 'Failed to get assignment' };
   }
 }
+
+
+export async function updateCompleted(id: string, newData: EditAssignExerciseData) {
+
+  try {
+    const assignment = await Assignment.findById(id);
+
+    if (!assignment) {
+      console.error("Assignment not found");
+      return { success: false, message: 'Assignment not found' };
+    }
+
+    if (newData.exercise_ids) {
+      const newExerciseId = newData.exercise_ids.toString();
+    
+      assignment.exercise_ids = assignment.exercise_ids.map((c) => {
+        if (c.exercise_id.equals(newExerciseId)) {
+          return {
+            ...c,
+            is_assigned: true, 
+            is_awaiting_reviews: false, 
+          };
+        }
+      });
+    }
+
+    await assignment.save();
+
+    return { success: true, message: 'Assignment updated successfully', data: assignment };
+
+  } catch (error: any) {
+    console.error("Error editing assignment:", error.message);
+    return { success: false, message: 'Failed to edit assignment' };
+  }
+}

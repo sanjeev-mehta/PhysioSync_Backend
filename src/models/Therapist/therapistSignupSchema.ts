@@ -32,7 +32,7 @@ const clinicSchema = new Schema<Clinic>({
 const authenticationSchema = new Schema<Authentication>({
   salt: { type: String, required: true, select: false },
   password: { type: String, required: true, select: false },
-  sessionToken: { type: String, required: false, select: false },
+  sessionToken: { type: String, required: false, unique:true, select: false },
 });
 
 const therapistSignupSchema: Schema<ITherapist> = new Schema({
