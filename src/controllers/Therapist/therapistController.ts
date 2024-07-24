@@ -38,9 +38,21 @@ export const addTherapist = async (req: Request, res: Response) => {
 
 export const editTherapistController = async (req: Request, res: Response) => {
   try {
-    const { sessionToken } = req.params;
+    const authorizationHeader = req.headers.authorization;
     const newData = req.body;
 
+      if (!authorizationHeader) {
+         res.status(401).json({ status: false, message: "Authorization header not found" });
+         return
+      }
+
+      const [bearer, sessionToken] = authorizationHeader.split(' ');
+
+    if (!sessionToken || bearer !== 'Bearer') {
+       res.status(401).json({ status: false, message: "Session token not found or invalid format" });
+       return
+    }
+    
     console.log('Received data for editing therapist:', newData);
 
     const result = await editTherapist(sessionToken, newData);
@@ -89,9 +101,19 @@ export const getTherapistController = async (req: Request, res: Response) => {
 
 export const updateTherapistPassword = async (req: Request, res: Response) => {
   try {
-    const { sessionToken } = req.params;
     const { oldPassword, newPassword } = req.body;
+    const authorizationHeader = req.headers.authorization;
 
+    if (!authorizationHeader) {
+      return res.status(401).json({ status: false, message: "Authorization header not found" });
+    }
+    const [bearer, sessionToken] = authorizationHeader.split(' ');
+
+    if (!sessionToken || bearer !== 'Bearer') {
+      return res.status(401).json({ status: false, message: "Session token not found or invalid format" });
+    }
+
+    console.log("Extracted session token:", sessionToken);
 
     console.log('Received data for editing therapist:', { oldPassword, newPassword });
 

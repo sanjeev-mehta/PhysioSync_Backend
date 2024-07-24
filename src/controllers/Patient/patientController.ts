@@ -34,14 +34,29 @@ interface PatientData {
 
 export const addNewPatient = async (req: Request, res: Response) => {
 
-  const {sessionToken} = req.params;
-
   try {
-    const therapist = await Therapist.findOne({ sessionToken: sessionToken });
+
+    const authorizationHeader = req.headers.authorization;
+
+    if (!authorizationHeader) {
+       res.status(401).json({ status: false, message: "Authorization header not found" });
+       return
+    }
+
+    const [bearer, sessionToken] = authorizationHeader.split(' ');
+
+  if (!sessionToken || bearer !== 'Bearer') {
+     res.status(401).json({ status: false, message: "Session token not found or invalid format" });
+     return
+  }
+
+    const therapist = await Therapist.findOne({ 'authentication.sessionToken': sessionToken });
+
+    console.log(therapist)
 
     if (!therapist) {
-      res.status(404).json({ success: false, message: 'Therapist not found please login again ' });
-      return
+       res.status(404).json({ success: false, message: 'Therapist not found please login again ' });
+       return
     }
 
     const {
@@ -97,13 +112,24 @@ export const addNewPatient = async (req: Request, res: Response) => {
 
 export const getAllPatients = async (req: Request, res: Response) => {
   try {
-    const { sessionToken } = req.params;
+    const authorizationHeader = req.headers.authorization;
+
+    if (!authorizationHeader) {
+      return res.status(401).json({ status: false, message: "Authorization header not found" });
+    }
+    const [bearer, sessionToken] = authorizationHeader.split(' ');
+
+    if (!sessionToken || bearer !== 'Bearer') {
+      return res.status(401).json({ status: false, message: "Session token not found or invalid format" });
+    }
+
+    console.log("Extracted session token:", sessionToken);
 
     if (sessionToken === null) {
       return res.status(409).json({ success: false, message: "Session token not found" });
     }
 
-    const therapist = await Therapist.findOne({ sessionToken: sessionToken });
+    const therapist = await Therapist.findOne({ 'authentication.sessionToken': sessionToken });
 
     if (!therapist || !therapist._id) {
       return res.status(409).json({ success: false, message: "Therapist not found login again" });

@@ -11,14 +11,29 @@ import mongoose from 'mongoose';
 
 export const createExercise = async (req: Request, res: Response): Promise<void> => {
     try {
-      const {sessionToken} = req.params;
+      const authorizationHeader = req.headers.authorization;
 
-      const therapist = await Therapist.findOne({ sessionToken: sessionToken });
+      if (!authorizationHeader) {
+         res.status(401).json({ status: false, message: "Authorization header not found" });
+         return
+      }
+
+      const [bearer, sessionToken] = authorizationHeader.split(' ');
+
+    if (!sessionToken || bearer !== 'Bearer') {
+       res.status(401).json({ status: false, message: "Session token not found or invalid format" });
+       return
+    }
+
+      const therapist = await Therapist.findOne({ 'authentication.sessionToken': sessionToken });
+
+      console.log(therapist)
 
       if (!therapist) {
          res.status(404).json({ success: false, message: 'Therapist not found please login again ' });
          return
       }
+
       const { category_id, category_name, video_Url, video_title, description } = req.body;
       const newExercise = new addExerciseModel({
         therapist_Id: therapist._id,
@@ -43,10 +58,29 @@ export const createExercise = async (req: Request, res: Response): Promise<void>
 
 export const getAllExercise = async (req: Request, res: Response): Promise<void> => {
   try {
-    const {sessionToken} = req.params;
+    const authorizationHeader = req.headers.authorization;
     const {name} = req.query;
-    
-    const therapist = await Therapist.findOne({ sessionToken: sessionToken });
+
+      if (!authorizationHeader) {
+         res.status(401).json({ status: false, message: "Authorization header not found" });
+         return
+      }
+
+      const [bearer, sessionToken] = authorizationHeader.split(' ');
+
+    if (!sessionToken || bearer !== 'Bearer') {
+       res.status(401).json({ status: false, message: "Session token not found or invalid format" });
+       return
+    }
+
+      const therapist = await Therapist.findOne({ 'authentication.sessionToken': sessionToken });
+
+      console.log(therapist)
+
+      if (!therapist) {
+         res.status(404).json({ success: false, message: 'Therapist not found please login again ' });
+         return
+      }
 
     if (!therapist) {
          res.status(404).json({ success: false, message: 'Therapist not found please login again ' });
@@ -109,13 +143,28 @@ export const delete_exercise = async (req: Request, res:Response): Promise<void>
 
 export const addAssignmentExercise = async (req: Request, res: Response): Promise<void> => {
   try {
-      const { sessionToken } = req.params;
-      const therapist = await Therapist.findOne({ sessionToken: sessionToken });
+    const authorizationHeader = req.headers.authorization;
 
-      if (!therapist) {
-          res.status(404).json({ success: false, message: 'Therapist not found please login again' });
-          return;
-      }
+    if (!authorizationHeader) {
+       res.status(401).json({ status: false, message: "Authorization header not found" });
+       return
+    }
+
+    const [bearer, sessionToken] = authorizationHeader.split(' ');
+
+  if (!sessionToken || bearer !== 'Bearer') {
+     res.status(401).json({ status: false, message: "Session token not found or invalid format" });
+     return
+  }
+
+    const therapist = await Therapist.findOne({ 'authentication.sessionToken': sessionToken });
+
+    console.log(therapist)
+
+    if (!therapist) {
+       res.status(404).json({ success: false, message: 'Therapist not found please login again ' });
+       return
+    }
 
       const {
           exercise_ids,
@@ -248,15 +297,28 @@ export const getAssignmentExercise = async (req: Request, res: Response) => {
 
 export const getTherapistNotification = async (req: Request, res: Response) => {
   try {
-    const {sessionToken} = req.params;
-    
-    const therapist = await Therapist.findOne({ sessionToken: sessionToken });
+    const authorizationHeader = req.headers.authorization;
 
-    if (!therapist) {
-      res.status(404).json({ success: false, message: 'Therapist not found please login again ' });
-      return
+      if (!authorizationHeader) {
+         res.status(401).json({ status: false, message: "Authorization header not found" });
+         return
+      }
+
+      const [bearer, sessionToken] = authorizationHeader.split(' ');
+
+    if (!sessionToken || bearer !== 'Bearer') {
+       res.status(401).json({ status: false, message: "Session token not found or invalid format" });
+       return
     }
 
+      const therapist = await Therapist.findOne({ 'authentication.sessionToken': sessionToken });
+
+      console.log(therapist)
+
+      if (!therapist) {
+         res.status(404).json({ success: false, message: 'Therapist not found please login again ' });
+         return
+      }
     const result = await getNotification(therapist._id as string);
 
     if (result && result.success) {
