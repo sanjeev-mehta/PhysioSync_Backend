@@ -79,8 +79,11 @@ export const getAllExercise = async (req: Request, res: Response): Promise<void>
       return;
     }
     
-    const exercises = await addExerciseModel.find({
-      category_name: name as string });
+    const finalToken = therapist._id as string;
+  
+    const query = {therapist_id: finalToken, category_name: name as string}
+    
+    const exercises = await addExerciseModel.find(query);
 
     res.status(200).json({success: true,message: "All exercise fetched successfuly",  data: exercises});
  
