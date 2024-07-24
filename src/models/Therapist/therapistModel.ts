@@ -138,7 +138,7 @@ export async function getSingleTherapist(sessionToken: string) {
 export async function updatePassword(sessionToken: string, oldPassword: string, newPassword: string){
 
   try {
-    const query = { sessionToken: sessionToken };
+    const query = { 'authentication.sessionToken': sessionToken };
     const therapist = await Therapist.findOne(query).select('+authentication.salt +authentication.password');
 
     if (!therapist) {

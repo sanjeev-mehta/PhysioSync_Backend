@@ -75,7 +75,7 @@ io.on('connection', (socket: Socket) => {
             { _id: { $in: messageIds } },
             { is_read: true }
         );
-        console.log(`Messages ${messageIds.join(', ')} marked as read`);
+        // console.log(`Messages ${messageIds.join(', ')} marked as read`);
         socket.emit('messageReadResponse', { success: true });
     } catch (error) {
         console.error('Error updating message statuses:', error);
@@ -93,7 +93,7 @@ io.on('connection', (socket: Socket) => {
         ]
       }).sort({ createdAt: -1 }).limit(100); 
       socket.emit('previousMessages', messages);
-      console.log(`Fetched previous messages for ${senderId} and ${receiverId}`);
+      // console.log(`Fetched previous messages for ${senderId} and ${receiverId}`);
     } catch (error) {
       console.error('Error fetching previous messages:', error);
     }
@@ -140,7 +140,7 @@ io.on('connection', (socket: Socket) => {
           is_read: false
         });
   
-        console.log(unreadCount);
+        // console.log(unreadCount);
 
         return {
           patientId,
@@ -165,7 +165,7 @@ io.on('connection', (socket: Socket) => {
       });
   
       socket.emit('allPatientsWithDetails', patientsWithDetails);
-      console.log(`Fetched all patients with details and unread counts for therapist ${id}`);
+      // console.log(`Fetched all patients with details and unread counts for therapist ${id}`);
     } catch (error) {
       console.error('Error fetching all patient details and latest messages for therapist:', error);
     }
@@ -178,7 +178,7 @@ io.on('connection', (socket: Socket) => {
       delete users[userId];
       onlineUsers.delete(userId);
 
-      console.log(`${userId} left`);
+      // console.log(`${userId} left`);
       updateOnlineUsers();
 
       socket.broadcast.emit('left', userId);
