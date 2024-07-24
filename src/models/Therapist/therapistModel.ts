@@ -80,7 +80,7 @@ export async function editTherapist(sessionToken: string, newData: Partial<Thera
   console.log("Received Data for Editing Therapist:", newData);
 
   try {
-    const query = { sessionToken: sessionToken };
+    const query = {'authentication.sessionToken': sessionToken };
     const therapist = await Therapist.findOne(query);
 
     if (!therapist) {
