@@ -177,14 +177,8 @@ export const addAssignmentExercise = async (req: Request, res: Response): Promis
 
       console.log('Received data for creating assignment:', req.body);
 
-      const formattedExerciseIds = exercise_ids.map((id: mongoose.Types.ObjectId) => ({
-          exercise_id: id,
-          is_assigned: false,
-          is_awaiting_reviews: false,
-      }));
-
       const result = await addassignExercise({
-          exercise_ids: formattedExerciseIds,
+          exercise_ids,
           patient_id,
           start_date,
           end_date,
