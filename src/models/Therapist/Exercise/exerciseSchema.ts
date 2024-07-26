@@ -19,24 +19,22 @@ interface IAssignment extends Document {
   therapist_id: String;
 }
 
-const exerciseAssignmentSchema: Schema<IExerciseAssignment> = new Schema({
-  exercise_id: {
-    type: Schema.Types.ObjectId,
-    ref: 'exercises',
-    required: true
-  },
-  is_assigned: {
-    type: Boolean,
-    default: false
-  },
-  is_awaiting_reviews: {
-    type: Boolean,
-    default: false
-  }
-});
-
 const assignmentSchema: Schema<IAssignment> = new Schema({
-  exercise_ids: [exerciseAssignmentSchema],
+  exercise_ids: [{
+    exercise_id: {
+      type: Schema.Types.ObjectId,
+      ref: 'exercises',
+      required: true
+    },
+    is_assigned: {
+      type: Boolean,
+      default: false
+    },
+    is_awaiting_reviews: {
+      type: Boolean,
+      default: false
+    }
+  }],
   patient_id: {
     type: Schema.Types.ObjectId,
     ref: 'Patients',

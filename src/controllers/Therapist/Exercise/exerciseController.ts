@@ -279,8 +279,21 @@ export const getAssignmentExercise = async (req: Request, res: Response) => {
       }
       
       const watchDataArray = await PatientWatchData.find({ patient_id })
-      const assignments = await Assignment.find({ patient_id, is_awaiting_reviews: false })
-      .populate('exercise_ids.exercise_id');
+      const assignments = await Assignment.find({ patient_id, is_awaiting_reviews: false }).populate('exercise_ids.exercise_id.exercise_id')
+
+      assignments.forEach(exercise => {
+        console.log(`Exercise ID: ${exercise._id}`);
+        
+        exercise.exercise_ids.forEach(exerciseItem => {
+            console.log(addExerciseModel.findById(exerciseItem.exercise_id));
+            console.log(`  Is Assigned: ${exerciseItem.is_assigned}`);
+            console.log(`  Is Awaiting Reviews: ${exerciseItem.is_awaiting_reviews}`);
+        });
+
+        addExerciseModel.findById('66a2e6a2290041411666e421');
+
+    });
+      
       const watchData = watchDataArray[0];
       const patientData = {
           patient: patient,
