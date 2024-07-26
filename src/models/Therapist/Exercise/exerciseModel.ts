@@ -52,15 +52,10 @@ export async function addassignExercise(data: AssignExerciseData) {
       therapist_id
     } = data;
 
-    const sentExerciseID = {
-      exercise_id: data.exercise_ids,
-      is_assigned: true, 
-      is_awaiting_reviews: false,
-      status: 'assigned', 
-    }
+    
 
     const newAssignment = new Assignment({
-      exercise_ids: sentExerciseID,
+      exercise_ids,
       patient_id,
       start_date,
       end_date,

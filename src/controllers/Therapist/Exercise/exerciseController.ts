@@ -177,15 +177,16 @@ export const addAssignmentExercise = async (req: Request, res: Response): Promis
 
       console.log('Received data for creating assignment:', req.body);
 
-      const result = await addassignExercise({
-          exercise_ids,
-          patient_id,
-          start_date,
-          end_date,
-          patient_video_url,
-          patient_exercise_completion_date_time,
-          therapist_id: therapist._id.toString(),
-      });
+    const result = await addassignExercise({
+        exercise_ids,
+        patient_id,
+        start_date,
+        end_date,
+        patient_video_url,
+        patient_exercise_completion_date_time,
+        therapist_id: therapist._id.toString(),
+    });
+
 
       if (result && result.success) {
           res.status(201).json({ status: 201, success: true, message: result.message, data: result.data });
