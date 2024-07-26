@@ -182,6 +182,8 @@ export async function updateCompleted(id: string, newData: EditAssignExerciseDat
   try {
     const assignment = await Assignment.findByIdAndUpdate(id);
 
+    console.log('this is the id and Data', id, newData);
+
     if (!assignment) {
       console.error("Assignment not found");
       return { success: false, message: 'Assignment not found' };
@@ -191,6 +193,7 @@ export async function updateCompleted(id: string, newData: EditAssignExerciseDat
       const newExerciseId = new mongoose.Types.ObjectId(`${newData.exercise_ids.toString()}`);
     
       assignment.exercise_ids = assignment.exercise_ids.map((c) => {
+        console.log('here is true or false', c.exercise_id.equals(newExerciseId))
         if (c.exercise_id.equals(newExerciseId)) {
           return {
             exercise_id: newExerciseId,
