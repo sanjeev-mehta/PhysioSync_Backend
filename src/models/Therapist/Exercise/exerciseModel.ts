@@ -204,6 +204,7 @@ export async function updateCompleted(id: string, newData: EditAssignExerciseDat
             patient_exercise_completion_date_time: newData.patient_exercise_completion_date_time
           };
         }
+        return c;
       });
     }
 
