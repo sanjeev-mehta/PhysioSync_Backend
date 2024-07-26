@@ -342,7 +342,7 @@ export const getTherapistNotification = async (req: Request, res: Response) => {
     if (result && result.success) {
       res.status(200).json({ status: 200, success: true, message: result.message, data: result.data });
     } else {
-      res.status(404).json({ status: 404, success: false, error: result.message, data: result.data });
+      res.status(404).json({ status: 404, success: true, message: result.message, data: result.data });
     }
   } catch (error: any) {
     console.error('Error in getAssignment controller:', error.message);
