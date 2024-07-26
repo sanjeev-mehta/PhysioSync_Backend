@@ -158,9 +158,9 @@ export async function editAssignExercise(id: string, newData: EditAssignExercise
 
 export async function getNotification(id: string) {
   try {
-    const assignment = await Assignment.find({therapist_id: id, status:"completed", is_awaiting_reviews: false})
+    const assignment = await Assignment.find({therapist_id: id, "exercise_ids.status":"completed", "exercise_ids.is_awaiting_reviews": false})
     .populate('patient_id')
-    .populate('exercise_ids');
+    .populate('exercise_ids.exercise_id');
 
     console.log(assignment, id)
     if (!assignment) {
