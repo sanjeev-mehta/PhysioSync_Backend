@@ -23,6 +23,9 @@ interface EditAssignExerciseData {
     exercise_id: mongoose.Types.ObjectId;
     is_assigned?: boolean;
     is_awaiting_reviews?: boolean;
+    status: 'assigned' | 'completed' | 'reviewed';
+    patient_video_url?: string;
+    patient_exercise_completion_date_time?: string;
   }[];
   start_date?: string;
   end_date?: string;
@@ -49,8 +52,15 @@ export async function addassignExercise(data: AssignExerciseData) {
       therapist_id
     } = data;
 
+    const sentExerciseID = {
+      exercise_id: data.exercise_ids,
+      is_assigned: true, 
+      is_awaiting_reviews: false,
+      status: 'assigned', 
+    }
+
     const newAssignment = new Assignment({
-      exercise_ids,
+      exercise_ids: sentExerciseID,
       patient_id,
       start_date,
       end_date,
@@ -90,8 +100,8 @@ export async function editAssignExercise(id: string, newData: EditAssignExercise
           const objectId = new mongoose.Types.ObjectId(`${exerciseId}`);
           return {
             exercise_id: objectId,
-            is_assigned: false, 
-            is_awaiting_reviews: false, 
+            is_assigned: true,
+            is_awaiting_reviews: false,
           } 
         } catch (error) {
           console.error("Invalid exercise_id format:", exerciseId);
@@ -170,7 +180,7 @@ export async function getNotification(id: string) {
 export async function updateCompleted(id: string, newData: EditAssignExerciseData) {
 
   try {
-    const assignment = await Assignment.findById(id);
+    const assignment = await Assignment.findByIdAndUpdate(id);
 
     if (!assignment) {
       console.error("Assignment not found");
@@ -178,14 +188,17 @@ export async function updateCompleted(id: string, newData: EditAssignExerciseDat
     }
 
     if (newData.exercise_ids) {
-      const newExerciseId = newData.exercise_ids.toString();
+      const newExerciseId = new mongoose.Types.ObjectId(`${newData.exercise_ids.toString()}`);
     
       assignment.exercise_ids = assignment.exercise_ids.map((c) => {
         if (c.exercise_id.equals(newExerciseId)) {
           return {
-            ...c,
+            exercise_id: newExerciseId,
             is_assigned: true, 
             is_awaiting_reviews: false, 
+            status: 'completed',
+            patient_video_url: newData.patient_video_url,
+            patient_exercise_completion_date_time: newData.patient_exercise_completion_date_time
           };
         }
       });

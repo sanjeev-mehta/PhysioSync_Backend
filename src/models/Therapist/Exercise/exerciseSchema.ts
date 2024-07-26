@@ -4,6 +4,9 @@ interface IExerciseAssignment {
   exercise_id: mongoose.Types.ObjectId;
   is_assigned: boolean;
   is_awaiting_reviews: boolean;
+  status?: 'assigned' | 'completed' | 'reviewed';
+  patient_video_url?: string;
+  patient_exercise_completion_date_time?: string;
 }
 
 interface IAssignment extends Document {
@@ -33,6 +36,19 @@ const assignmentSchema: Schema<IAssignment> = new Schema({
     is_awaiting_reviews: {
       type: Boolean,
       default: false
+    },
+    status: {
+      type: String,
+      enum: ['assigned', 'completed', 'reviewed'],
+      default: 'assigned'
+    },
+    patient_video_url: {
+      type: String,
+      required: false
+    },
+    patient_exercise_completion_date_time: {
+      type: String,
+      required: false
     }
   }],
   patient_id: {
