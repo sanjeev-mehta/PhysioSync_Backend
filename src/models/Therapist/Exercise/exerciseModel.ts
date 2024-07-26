@@ -184,28 +184,29 @@ export async function getNotification(id: string) {
     console.log(assignment, id)
     if (!assignment) {
       console.error("Assignment not found");
-      return { success: false, message: 'Assignment not found' };
+      return { success: false, message: 'Assignment not found', data: [] };
     }
 
-    const filteredAssignments = assignment.map(assignment => {
+   const filteredAssignments = assignment.map(assignment => {
       const filteredExerciseIds = assignment.exercise_ids.filter(exercise => exercise.status === 'completed');
       return {
         ...assignment.toObject(), // Convert Mongoose document to plain object
         exercise_ids: filteredExerciseIds
       };
-    });
+    })
 
     console.log(filteredAssignments, id);
+    
     if (filteredAssignments.length === 0) {
       console.error("Assignment not found");
-      return { success: false, message: 'Assignment not found' };
+      return { success: false, message: 'Assignment not found', data: [] };
     }
 
-    return { success: true, message: 'Assignment found successfully', data: filteredAssignments };
+    return { success: true, message: 'Assignment found successfully', data: filteredAssignments};
 
   } catch (error: any) {
     console.error("Error getting assignment:", error.message);
-    return { success: false, message: 'Failed to get assignment' };
+    return { success: false, message: 'Failed to get assignment', data: [] };
   }
 }
 
