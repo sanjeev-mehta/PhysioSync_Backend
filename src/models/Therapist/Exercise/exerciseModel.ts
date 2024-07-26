@@ -98,6 +98,7 @@ export async function editAssignExercise(id: string, newData: EditAssignExercise
       assignment.exercise_ids = newData.exercise_ids.map((exerciseId) => {
         try {
           const objectId = new mongoose.Types.ObjectId(`${exerciseId}`);
+          console.log(newData.is_awaiting_reviews)
           return {
             exercise_id: objectId,
             is_assigned: true,
@@ -113,6 +114,24 @@ export async function editAssignExercise(id: string, newData: EditAssignExercise
         }
       });
     }
+
+    if (newData.is_awaiting_reviews) {
+      console.log("it enters")
+      const newExerciseId = new mongoose.Types.ObjectId(`${newData.exercise_ids.toString()}`);
+    
+      assignment.exercise_ids = assignment.exercise_ids.map((c) => {
+        console.log('here is true or false', c.exercise_id.equals(newExerciseId))
+        if (c.exercise_id.equals(newExerciseId)) {
+          return {
+            exercise_id: newExerciseId,
+            is_assigned: true, 
+            is_awaiting_reviews: newData.is_awaiting_reviews, 
+          };
+        }
+        return c;
+      });
+    }
+
 
     if (newData.start_date) assignment.start_date = newData.start_date;
     if (newData.end_date) assignment.end_date = newData.end_date;
@@ -212,7 +231,7 @@ export async function updateCompleted(id: string, newData: EditAssignExerciseDat
           return {
             exercise_id: newExerciseId,
             is_assigned: true, 
-            is_awaiting_reviews: false, 
+            is_awaiting_reviews: newData.is_awaiting_reviews, 
             status: 'completed',
             patient_video_url: newData.patient_video_url,
             patient_exercise_completion_date_time: newData.patient_exercise_completion_date_time
