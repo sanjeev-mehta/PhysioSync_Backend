@@ -101,7 +101,7 @@ export async function editAssignExercise(id: string, newData: EditAssignExercise
           return {
             exercise_id: objectId,
             is_assigned: true,
-            is_awaiting_reviews: false,
+            is_awaiting_reviews: newData.is_awaiting_reviews !== undefined ? newData.is_awaiting_reviews : false,
           } 
         } catch (error) {
           console.error("Invalid exercise_id format:", exerciseId);
