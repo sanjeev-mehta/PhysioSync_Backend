@@ -85,12 +85,24 @@ export async function editAssignExercise(id: string, newData: EditAssignExercise
     }
 
     if (newData.exercise_ids) {
-      assignment.exercise_ids = newData.exercise_ids.map((exercise: any) => ({
-          exercise_id: new mongoose.Types.ObjectId(exercise.exercise_id),
-          is_assigned: exercise.is_assigned,
-          is_awaiting_reviews: exercise.is_awaiting_reviews,
-      }));
-  }
+      assignment.exercise_ids = newData.exercise_ids.map((exercise: any) => {
+        try {
+          const exerciseId = new mongoose.Types.ObjectId(exercise.exercise_id);
+          return {
+            exercise_id: exerciseId,
+            is_assigned: exercise.is_assigned,
+            is_awaiting_reviews: exercise.is_awaiting_reviews,
+          };
+        } catch (error) {
+          console.error("Invalid exercise_id format:", exercise.exercise_id);
+          return {
+            exercise_id: null,
+            is_assigned: exercise.is_assigned,
+            is_awaiting_reviews: exercise.is_awaiting_reviews,
+          };
+        }
+      });
+    }
     if (newData.start_date) assignment.start_date = newData.start_date;
     if (newData.end_date) assignment.end_date = newData.end_date;
     if (newData.status) assignment.status = newData.status;
