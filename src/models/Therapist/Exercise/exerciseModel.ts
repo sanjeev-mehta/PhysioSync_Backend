@@ -1,5 +1,5 @@
 import Assignment, { IAssignment } from './exerciseSchema'; 
-import mongoose from 'mongoose';
+import mongoose, { ObjectId } from 'mongoose';
 import Patient from '../../../models/Patient/patientModel';
 
 interface AssignExerciseData {
@@ -84,25 +84,26 @@ export async function editAssignExercise(id: string, newData: EditAssignExercise
       return { success: false, message: 'Assignment not found' };
     }
 
-    if (newData.exercise_ids) {
-      assignment.exercise_ids = newData.exercise_ids.map((exercise: any) => {
+    if (newData.exercise_ids && Array.isArray(newData.exercise_ids)) {
+      assignment.exercise_ids = newData.exercise_ids.map((exerciseId) => {
         try {
-          const exerciseId = new mongoose.Types.ObjectId(exercise.exercise_id);
+          const objectId = new mongoose.Types.ObjectId(`${exerciseId}`);
           return {
-            exercise_id: exerciseId,
-            is_assigned: exercise.is_assigned,
-            is_awaiting_reviews: exercise.is_awaiting_reviews,
-          };
+            exercise_id: objectId,
+            is_assigned: false, 
+            is_awaiting_reviews: false, 
+          } 
         } catch (error) {
-          console.error("Invalid exercise_id format:", exercise.exercise_id);
+          console.error("Invalid exercise_id format:", exerciseId);
           return {
             exercise_id: null,
-            is_assigned: exercise.is_assigned,
-            is_awaiting_reviews: exercise.is_awaiting_reviews,
-          };
+            is_assigned: false,
+            is_awaiting_reviews: false, 
+          } 
         }
       });
     }
+
     if (newData.start_date) assignment.start_date = newData.start_date;
     if (newData.end_date) assignment.end_date = newData.end_date;
     if (newData.status) assignment.status = newData.status;

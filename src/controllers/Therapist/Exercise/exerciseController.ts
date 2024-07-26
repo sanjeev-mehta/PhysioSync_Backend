@@ -211,6 +211,8 @@ export const editAssignmentExercise = async (req: Request, res: Response): Promi
       const { id } = req.params;
       const newData = req.body;
 
+      console.log("This is my new Data", newData);
+
       console.log('Received data for editing assignment:', id);
 
       const result = await editAssignExercise(id, newData);
