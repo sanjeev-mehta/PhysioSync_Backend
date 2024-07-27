@@ -56,11 +56,6 @@ export const login = async (req: Request, res: Response) => {
         const sessionSalt = random();
         user.authentication.sessionToken = authentication(sessionSalt, user._id.toString());
 
-        if(user.is_authenticated == true){
-            return
-        }else{
-            user.is_authenticated = true;
-        }
         await user.save();
 
         res.cookie('physio-sync', user.authentication.sessionToken, { domain: 'localhost', path: '/', httpOnly: true });
