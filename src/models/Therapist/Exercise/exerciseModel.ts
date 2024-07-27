@@ -188,7 +188,7 @@ export async function updateCompleted(id: string, newData: EditAssignExerciseDat
             exercise_id: newExerciseId,
             is_assigned: true, 
             is_awaiting_reviews: newData.is_awaiting_reviews, 
-            status: 'completed',
+            status: newData.status == undefined? 'completed': newData.status,
             patient_video_url: newData.patient_video_url,
             patient_exercise_completion_date_time: newData.patient_exercise_completion_date_time
           };
