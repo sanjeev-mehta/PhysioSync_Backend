@@ -46,7 +46,7 @@ export async function addassignExercise(data: AssignExerciseData) {
       start_date,
       end_date,
       status = 'assigned',
-      is_awaiting_reviews = false,
+      is_awaiting_reviews = true,
       patient_video_url,
       patient_exercise_completion_date_time,
       therapist_id
@@ -132,7 +132,7 @@ export async function editAssignExercise(id: string, newData: EditAssignExercise
 
 export async function getNotification(id: string) {
   try {
-    const assignment = await Assignment.find({therapist_id: id, "exercise_ids.status":"completed", "exercise_ids.is_awaiting_reviews": false})
+    const assignment = await Assignment.find({therapist_id: id, "exercise_ids.status":"completed", "exercise_ids.is_awaiting_reviews": true})
     .populate('patient_id')
     .populate('exercise_ids.exercise_id');
 
@@ -187,7 +187,7 @@ export async function updateCompleted(id: string, newData: EditAssignExerciseDat
           return {
             exercise_id: newExerciseId,
             is_assigned: true, 
-            is_awaiting_reviews: newData.is_awaiting_reviews, 
+            is_awaiting_reviews: newData.is_awaiting_reviews  == undefined? c.is_awaiting_reviews : newData.is_awaiting_reviews, 
             status: newData.status == undefined? 'completed': newData.status,
             patient_video_url: newData.patient_video_url == undefined? c.patient_video_url : newData.patient_video_url,
             patient_exercise_completion_date_time: newData.patient_exercise_completion_date_time == undefined? c.patient_exercise_completion_date_time : newData.patient_exercise_completion_date_time

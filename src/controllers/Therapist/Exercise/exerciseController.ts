@@ -262,15 +262,34 @@ export const getAssignmentExercise = async (req: Request, res: Response) => {
       }
       
       const watchDataArray = await PatientWatchData.find({ patient_id })
-      const assignments = await Assignment.find({ patient_id, is_awaiting_reviews: false }).populate({
+      const assignments = await Assignment.find({
+        "patient_id": patient_id,
+        "exercise_ids.is_awaiting_reviews": true
+      }).populate({
         path: 'exercise_ids.exercise_id',
-        model: 'exercises' 
+        model: 'exercises'
       });
-      
+
+      const filteredAssignments = assignments.filter(assignment => {
+        return assignment.exercise_ids.some(exercise => 
+          exercise.is_awaiting_reviews === true &&
+          (assignment.status === 'assigned' || assignment.status === 'completed')
+        );
+      });
+
+      const result = filteredAssignments.map(assignment => ({
+        ...assignment.toObject(),
+        exercise_ids: assignment.exercise_ids.filter(exercise =>
+          exercise.is_awaiting_reviews === true &&
+          (assignment.status === 'assigned' || assignment.status === 'completed')
+        )
+      }));
+
+
       const watchData = watchDataArray[0];
       const patientData = {
           patient: patient,
-          exercise: assignments || [],
+          exercise: result || [],
           watchData: watchData, 
       };
 

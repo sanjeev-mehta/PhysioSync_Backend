@@ -3,7 +3,7 @@ import mongoose, { Document, Schema } from 'mongoose';
 interface IExerciseAssignment {
   exercise_id: mongoose.Types.ObjectId;
   is_assigned: boolean;
-  is_awaiting_reviews: boolean;
+  is_awaiting_reviews: Boolean;
   status?: 'assigned' | 'completed' | 'reviewed';
   patient_video_url?: string;
   patient_exercise_completion_date_time?: string;
