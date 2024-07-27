@@ -210,17 +210,18 @@ export async function updatepatientPassword(patient_id: string, oldPassword: str
  }
 }
 
-export async function deleteTherapist(therapistId: string) {
-  console.log("Received therapist ID for deleting Therapist:", therapistId);
+export async function deleteTherapist(sessionToken: string) {
+  console.log("Received therapist ID for deleting Therapist:", sessionToken);
 
   try {
-    const therapist = await Therapist.findById(therapistId);
+    const query = { 'authentication.sessionToken': sessionToken };
+    const therapist = await Therapist.findOne(query)
 
     if (!therapist) {
       console.error("Therapist not found");
-      return { success: false, message: 'Therapist not found' };
+      return { success: true, message: 'Therapist not found' };
     }
-
+    
     therapist.is_active = false;
     await therapist.save();
 

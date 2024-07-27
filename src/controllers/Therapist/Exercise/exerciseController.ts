@@ -177,16 +177,23 @@ export const addAssignmentExercise = async (req: Request, res: Response): Promis
 
       console.log('Received data for creating assignment:', req.body);
 
-    const result = await addassignExercise({
-        exercise_ids,
-        patient_id,
-        start_date,
-        end_date,
-        patient_video_url,
-        patient_exercise_completion_date_time,
-        therapist_id: therapist._id.toString(),
-    });
+      const formattedExerciseIds = exercise_ids.map((id: mongoose.Types.ObjectId) => ({
+          exercise_id: id,
+          is_assigned: true,
+          is_awaiting_reviews: false,
+      }));
 
+      
+
+      const result = await addassignExercise({
+          exercise_ids: formattedExerciseIds,
+          patient_id,
+          start_date,
+          end_date,
+          patient_video_url,
+          patient_exercise_completion_date_time,
+          therapist_id: therapist._id.toString(),
+      });
 
       if (result && result.success) {
           res.status(201).json({ status: 201, success: true, message: result.message, data: result.data });
@@ -200,7 +207,6 @@ export const addAssignmentExercise = async (req: Request, res: Response): Promis
   }
 };
 
-// Edit an assignment exercise
 export const editAssignmentExercise = async (req: Request, res: Response): Promise<void> => {
   try {
       const { id } = req.params;
@@ -246,26 +252,6 @@ export const updateCompletedExercise = async (req: Request, res: Response): Prom
   }
 };
 
-//   export const getAssignmentExercise = async (req: Request, res: Response) => {
-//     try {
-//       const { patient_id } = req.params;
-  
-//       console.log('Received ID for getting assignment:', patient_id);
-
-//       const data = await getAssignedExercise(patient_id)
-
-//       res.status(200).json({ 
-//       success: true, 
-//       message: 'Assignment found successfully',
-//       data: data 
-//     });
-
-//   } catch (error: any) {
-//     console.error('Error in getAssignment controller:', error.message);
-//     res.status(500).json({ status: 500, success: false, error: 'Internal Server Error' });
-//   }
-// };
-
 export const getAssignmentExercise = async (req: Request, res: Response) => {
   try {
       const { patient_id } = req.params;
@@ -278,21 +264,8 @@ export const getAssignmentExercise = async (req: Request, res: Response) => {
       const watchDataArray = await PatientWatchData.find({ patient_id })
       const assignments = await Assignment.find({ patient_id, is_awaiting_reviews: false }).populate({
         path: 'exercise_ids.exercise_id',
-        model: 'exercises' // Ensure this matches the AddExercise model name
+        model: 'exercises' 
       });
-
-      // assignments.forEach(exercise => {
-      //   console.log(`Exercise ID: ${exercise._id}`);
-        
-      //   exercise.exercise_ids.forEach(exerciseItem => {
-      //       console.log(addExerciseModel.findById(exerciseItem.exercise_id));
-      //       console.log(`  Is Assigned: ${exerciseItem.is_assigned}`);
-      //       console.log(`  Is Awaiting Reviews: ${exerciseItem.is_awaiting_reviews}`);
-      //   });
-
-        // addExerciseModel.findById('66a2e6a2290041411666e421');
-
-    // });
       
       const watchData = watchDataArray[0];
       const patientData = {

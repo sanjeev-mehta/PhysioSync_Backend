@@ -23,7 +23,7 @@ interface EditAssignExerciseData {
     exercise_id: mongoose.Types.ObjectId;
     is_assigned?: boolean;
     is_awaiting_reviews?: boolean;
-    status: 'assigned' | 'completed' | 'reviewed';
+    status?: 'assigned' | 'completed' | 'reviewed';
     patient_video_url?: string;
     patient_exercise_completion_date_time?: string;
   }[];
@@ -52,10 +52,15 @@ export async function addassignExercise(data: AssignExerciseData) {
       therapist_id
     } = data;
 
-    
+    const formattedExerciseIds = exercise_ids.map(id => ({
+      exercise_id: id.exercise_id,
+      is_assigned: id.is_assigned ?? true,
+      is_awaiting_reviews: id.is_awaiting_reviews ?? is_awaiting_reviews,
+      status: status,
+    }));
 
     const newAssignment = new Assignment({
-      exercise_ids,
+      exercise_ids: formattedExerciseIds,
       patient_id,
       start_date,
       end_date,
@@ -97,7 +102,7 @@ export async function editAssignExercise(id: string, newData: EditAssignExercise
           return {
             exercise_id: objectId,
             is_assigned: true,
-            is_awaiting_reviews: newData.is_awaiting_reviews !== undefined ? newData.is_awaiting_reviews : false,
+            is_awaiting_reviews: assignment.is_awaiting_reviews
           } 
         } catch (error) {
           console.error("Invalid exercise_id format:", exerciseId);
@@ -110,31 +115,8 @@ export async function editAssignExercise(id: string, newData: EditAssignExercise
       });
     }
 
-    if (newData.is_awaiting_reviews) {
-      console.log("it enters")
-      const newExerciseId = new mongoose.Types.ObjectId(`${newData.exercise_ids.toString()}`);
-    
-      assignment.exercise_ids = assignment.exercise_ids.map((c) => {
-        console.log('here is true or false', c.exercise_id.equals(newExerciseId))
-        if (c.exercise_id.equals(newExerciseId)) {
-          return {
-            exercise_id: newExerciseId,
-            is_assigned: true, 
-            is_awaiting_reviews: newData.is_awaiting_reviews, 
-          };
-        }
-        return c;
-      });
-    }
-
-
     if (newData.start_date) assignment.start_date = newData.start_date;
     if (newData.end_date) assignment.end_date = newData.end_date;
-    if (newData.status) assignment.status = newData.status;
-    if (newData.is_awaiting_reviews !== undefined) assignment.is_awaiting_reviews = newData.is_awaiting_reviews;
-    if (newData.patient_video_url) assignment.patient_video_url = newData.patient_video_url;
-    if (newData.patient_exercise_completion_date_time) assignment.patient_exercise_completion_date_time = newData.patient_exercise_completion_date_time;
-    if (newData.therapist_id) assignment.therapist_id = newData.therapist_id;
 
     await assignment.save();
 
@@ -148,28 +130,6 @@ export async function editAssignExercise(id: string, newData: EditAssignExercise
   }
 }
 
-// export async function getAssignedExercise(id: string) {
-//   console.log("Received Assignment ID for getting Assignment:", id);
-
-//   try {
-//     const patient = await Patient.findById(id);
-//     const assignment = await Assignment.find({patient_id: id, is_awaiting_reviews: false})
-//     .populate('exercise_ids')
-
-//     console.log(patient);
-//     if (patient === null) {
-//       console.error("Assignment not found");
-//       return { success: false, message: 'Patient not found' };
-//     }
-
-//     return {exercise: assignment, patient: patient};
-
-//   } catch (error: any) {
-//     console.error("Error getting assignment:", error.message);
-//     return { success: false, message: 'Failed to get assignment' };
-//   }
-// }
-
 export async function getNotification(id: string) {
   try {
     const assignment = await Assignment.find({therapist_id: id, "exercise_ids.status":"completed", "exercise_ids.is_awaiting_reviews": false})
@@ -179,13 +139,13 @@ export async function getNotification(id: string) {
     console.log(assignment, id)
     if (!assignment) {
       console.error("Assignment not found");
-      return { success: false, message: 'Assignment not found', data: [] };
+      return  { success: false, message: 'Assignment not found', data: [] };
     }
 
    const filteredAssignments = assignment.map(assignment => {
       const filteredExerciseIds = assignment.exercise_ids.filter(exercise => exercise.status === 'completed');
       return {
-        ...assignment.toObject(), // Convert Mongoose document to plain object
+        ...assignment.toObject(), 
         exercise_ids: filteredExerciseIds
       };
     })

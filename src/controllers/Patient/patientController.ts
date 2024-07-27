@@ -147,7 +147,7 @@ export const getAllPatients = async (req: Request, res: Response) => {
 export const updatePatient = async (req: Request, res: Response) => {
   try {
     const patientId: string = req.params.patientId;
-    const updatedData = req.body; // Data to be updated
+    const updatedData = req.body;
 
     const updatedPatient = await Patient.findByIdAndUpdate(patientId, updatedData, { new: true });
 

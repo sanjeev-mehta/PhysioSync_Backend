@@ -158,11 +158,20 @@ export const updatePatientPassword = async (req: Request, res: Response) => {
 
 export const removeTherapist = async (req: Request, res: Response) => {
   try {
-    const { therapistId } = req.params;
+    const authorizationHeader = req.headers.authorization;
 
-    console.log('Received data for deleting therapist:', therapistId);
+    if (!authorizationHeader) {
+      return res.status(401).json({ status: false, message: "Authorization header not found" });
+    }
+    const [bearer, sessionToken] = authorizationHeader.split(' ');
 
-    const result = await deleteTherapist(therapistId);
+    if (!sessionToken || bearer !== 'Bearer') {
+      return res.status(401).json({ status: false, message: "Session token not found or invalid format" });
+    }
+
+    console.log("Extracted session token:", sessionToken);
+
+    const result = await deleteTherapist(sessionToken);
 
     if (result && result.success) {
       res.status(200).json({ status: 200, success: true, message: result.message });
