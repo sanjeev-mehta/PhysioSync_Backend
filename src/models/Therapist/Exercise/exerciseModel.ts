@@ -189,10 +189,10 @@ export async function updateCompleted(id: string, newData: EditAssignExerciseDat
             is_assigned: true, 
             is_awaiting_reviews: newData.is_awaiting_reviews, 
             status: newData.status == undefined? 'completed': newData.status,
-            patient_video_url: newData.patient_video_url,
-            patient_exercise_completion_date_time: newData.patient_exercise_completion_date_time
+            patient_video_url: newData.patient_video_url == undefined? c.patient_video_url : newData.patient_video_url,
+            patient_exercise_completion_date_time: newData.patient_exercise_completion_date_time == undefined? c.patient_exercise_completion_date_time : newData.patient_exercise_completion_date_time
           };
-        }
+        } 
         return c;
       });
     }
