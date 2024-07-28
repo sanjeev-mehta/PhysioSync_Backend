@@ -180,7 +180,7 @@ export const addAssignmentExercise = async (req: Request, res: Response): Promis
       const formattedExerciseIds = exercise_ids.map((id: mongoose.Types.ObjectId) => ({
           exercise_id: id,
           is_assigned: true,
-          is_awaiting_reviews: false,
+          is_awaiting_reviews: true,
       }));
 
       
@@ -262,13 +262,16 @@ export const getAssignmentExercise = async (req: Request, res: Response) => {
       }
       
       const watchDataArray = await PatientWatchData.find({ patient_id })
+      
       const assignments = await Assignment.find({
-        "patient_id": patient_id,
+        patient_id,
         "exercise_ids.is_awaiting_reviews": true
       }).populate({
         path: 'exercise_ids.exercise_id',
         model: 'exercises'
       });
+
+      console.log(assignments)
 
       const filteredAssignments = assignments.filter(assignment => {
         return assignment.exercise_ids.some(exercise => 
@@ -284,6 +287,8 @@ export const getAssignmentExercise = async (req: Request, res: Response) => {
           (assignment.status === 'assigned' || assignment.status === 'completed')
         )
       }));
+
+      console.log("this is result", result)
 
 
       const watchData = watchDataArray[0];
